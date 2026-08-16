@@ -1,0 +1,12 @@
+# beroenden och byggresultat
+node_modules/
+dist/
+.astro/
+
+# lokala anteckningar och referensmaterial — publiceras inte
+BRIEF.md
+assets/reference/
+
+# os/editor
+.DS_Store
+*.log

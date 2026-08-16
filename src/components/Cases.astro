@@ -1,0 +1,230 @@
+---
+/*
+  GATE FÖRE LANSERING:
+  1. Skriftligt tillstånd från varje namngiven klient (Foodtel, Hantverkskollen).
+  2. Varje siffra nedan är ägarens egen uppgift från gamla sajten och kräver
+     dokumentation före publicering (MD 2012:2 — omvänd bevisbörda).
+  3. Bilderna är hämtade från ägarens nuvarande sajt (hans bildval) —
+     verifiera licens före lansering, byt helst till verkligt casematerial.
+*/
+const base = import.meta.env.BASE_URL.replace(/\/+$/, '');
+const cases = [
+  {
+    client: 'Foodtel',
+    result: 'Löpande innehåll varje månad',
+    text: 'Vi driver Foodtels LinkedIn med film och foto varje månad — så att teamet kan lägga tiden på det de faktiskt bygger.',
+    stats: [
+      { v: '1k+', k: 'Nya följare' },
+      { v: '18+', k: 'Videos/foton per månad' },
+      { v: '190%', k: 'Ökad engagemang' },
+    ],
+    tags: ['LinkedIn', '4K-produktion', 'Content'],
+    img: `${base}/img/case-foodtel.webp`,
+  },
+  {
+    client: 'Hantverkskollen',
+    result: '500 % ökad webbtrafik',
+    text: 'Optimerad SEO och Google Ads som gett daglig, kvalificerad trafik — och förstaplatsen för sökningen som betyder mest.',
+    stats: [
+      { v: '500%', k: 'Ökad organisk trafik' },
+      { v: '#1', k: "Rankning 'hantverkare jämför pris'" },
+      { v: '250%', k: 'Fler kvalificerade demos' },
+    ],
+    tags: ['Teknisk SEO', 'Innehåll', 'Länkbygge'],
+    img: `${base}/img/case-hantverkskollen.webp`,
+  },
+  {
+    client: 'Nordiskt e-handelsföretag',
+    result: '340 % ökad försäljning',
+    text: 'Meta- och TikTok-kampanjer som tredubblade månadsförsäljningen på sex dagar — mätt i beställningar, inte visningar.',
+    stats: [
+      { v: '100+', k: 'Beställningar på 6 dagar' },
+      { v: '532k', k: 'Visningar på kampanjen' },
+      { v: '790%', k: 'ROAS' },
+    ],
+    tags: ['Meta & TikTok', 'Content'],
+    img: `${base}/img/case-ehandel.webp`,
+  },
+  {
+    client: 'Lokalt gatukök',
+    result: 'Komplett varumärkeslyft',
+    text: 'Ny visuell identitet och digital närvaro — från skylt till beställning.',
+    stats: [
+      { v: '95%', k: 'Förbättrad varumärkesbild' },
+      { v: '180%', k: 'Ökad trafik via nätet' },
+      { v: '45%', k: 'Fler beställningar via samtal' },
+    ],
+    tags: ['Varumärke', 'Webbdesign', 'Material'],
+    img: `${base}/img/case-gatukok.webp`,
+  },
+];
+---
+
+<section class="cases" id="arbete">
+  <div class="inner">
+    <p class="label section-label reveal">03 — Framgångshistorier</p>
+    <div class="grid">
+      {
+        cases.map((c, i) => (
+          <article class="plate reveal">
+            <div class="media">
+              <img src={c.img} alt="" loading="lazy" width="800" height="350" />
+              <p class="label idx">Ref. {String(i + 1).padStart(2, '0')}</p>
+            </div>
+            <h3 class="display">
+              {c.client} <span class="result">— {c.result}</span>
+            </h3>
+            <p class="text">{c.text}</p>
+            <dl class="stats">
+              {c.stats.map((s) => (
+                <div>
+                  <dd class="display">{s.v}</dd>
+                  <dt class="label">{s.k}</dt>
+                </div>
+              ))}
+            </dl>
+            <p class="tags label">{c.tags.join(' · ')}</p>
+          </article>
+        ))
+      }
+    </div>
+    <p class="fine reveal">Underlag och fler detaljer — hör av er, så visar vi.</p>
+  </div>
+</section>
+
+<style>
+  .cases {
+    padding: clamp(4rem, 10vh, 7rem) 0;
+  }
+  .inner {
+    max-width: var(--page-max);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+  .section-label { margin-bottom: 2.5rem; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.1rem;
+  }
+  .plate {
+    position: relative;
+    background: var(--ink-2);
+    overflow: hidden;
+    transition: background 0.3s;
+  }
+  .plate:hover { background: #1d2125; }
+
+  /* amber dash grows along the bottom edge on hover, stays until hover off */
+  .plate::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 3px;
+    background: var(--amber);
+    transform: scaleX(0);
+    transform-origin: left;
+    /* ingen övergång i viloläge → försvinner direkt vid hover-off */
+  }
+  .plate:hover::after {
+    transform: scaleX(1);
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .media {
+    position: relative;
+    aspect-ratio: 16 / 6;
+    overflow: hidden;
+  }
+  .media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.7) contrast(1.05) saturate(0.85);
+    transition: scale 0.7s cubic-bezier(0.22, 1, 0.36, 1), filter 0.7s;
+  }
+  .plate:hover .media img {
+    scale: 1.04;
+    filter: brightness(0.8) contrast(1.05) saturate(0.95);
+  }
+  .idx {
+    position: absolute;
+    top: 0.9rem;
+    left: 1.6rem;
+    color: var(--on-photo);
+    text-shadow: 0 1px 8px rgba(19, 21, 23, 0.7);
+  }
+  .media::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, var(--ink-2), transparent 40%);
+    pointer-events: none;
+  }
+  .plate:hover .media::after {
+    background: linear-gradient(to top, #1d2125, transparent 40%);
+  }
+
+  .plate > :not(.media) { margin-inline: 1.6rem; }
+
+  h3 {
+    font-size: clamp(1.25rem, 1.8vw, 1.6rem);
+    margin-top: 1.1rem;
+  }
+  .result { color: var(--bone-dim); }
+
+  .text {
+    margin-top: 0.7rem;
+    color: var(--bone-dim);
+    font-size: 0.92rem;
+    max-width: 34rem;
+  }
+
+  .stats {
+    margin: 1.1rem 0 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    border-top: 1px solid var(--hairline);
+    padding-top: 1rem;
+  }
+  dd {
+    margin: 0;
+    font-size: clamp(1.25rem, 1.7vw, 1.55rem);
+    color: var(--bone);
+  }
+  dd::after {
+    content: '';
+    display: block;
+    width: 1.4rem;
+    height: 2px;
+    margin-top: 0.4rem;
+    background: var(--amber);
+  }
+  dt {
+    margin-top: 0.4rem;
+    color: var(--grey);
+    font-size: 0.58rem;
+  }
+
+  .tags {
+    margin-top: 1.1rem;
+    padding-bottom: 1.5rem;
+    color: var(--amber);
+  }
+
+  .fine {
+    margin-top: 1.6rem;
+    color: var(--grey);
+    font-size: 0.85rem;
+  }
+
+  @media (max-width: 860px) {
+    .grid { grid-template-columns: 1fr; }
+    .plate > :not(.media) { margin-inline: 1.2rem; }
+    .stats { gap: 0.9rem; }
+  }
+</style>

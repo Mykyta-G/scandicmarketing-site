@@ -1,0 +1,91 @@
+---
+const faqs = [
+  {
+    q: 'Vad gör Scandic Marketing?',
+    a: 'Scandic Marketing är en marknadsföringsbyrå i Helsingborg som gör film, foto, hemsidor och digital marknadsföring för företag i Skåne och övriga Norden.',
+  },
+  {
+    q: 'Vad kostar en hemsida?',
+    a: 'Våra hemsidespaket hyrs till fast månadspris där design, utveckling, domän och underhåll ingår. Aktuella priser och vad som ingår finns på hemsidesidan.',
+  },
+  {
+    q: 'Vad kostar film eller foto?',
+    a: 'Det beror på omfattningen, så vi lämnar offert efter ett kort samtal. De flesta produktioner börjar runt 5 000 kr, och ni får alltid ett fast pris innan vi startar.',
+  },
+  {
+    q: 'Var håller ni till?',
+    a: 'På Redaregatan 48 i Helsingborg. Vi arbetar i hela Skåne och tar uppdrag i resten av Norden.',
+  },
+  {
+    q: 'Hur snabbt får jag svar?',
+    a: 'Vi svarar på förfrågningar inom en arbetsdag, vardagar 9–17.',
+  },
+];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+---
+
+<section class="faq" id="fragor">
+  <div class="inner">
+    <p class="label section-label reveal">05 — Vanliga frågor</p>
+    <div class="list">
+      {
+        faqs.map((f) => (
+          <details class="reveal">
+            <summary>
+              <span class="q display">{f.q}</span>
+              <span class="mark" aria-hidden="true">+</span>
+            </summary>
+            <p class="a">{f.a}</p>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+</section>
+
+<style>
+  .faq { padding: clamp(4rem, 10vh, 7rem) 0; }
+  .inner {
+    max-width: var(--page-max);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+  .section-label { margin-bottom: 2.5rem; }
+
+  .list { border-top: 1px solid var(--hairline); max-width: 52rem; }
+  details { border-bottom: 1px solid var(--hairline); }
+  summary {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 2rem;
+    padding: 1.5rem 0;
+    cursor: pointer;
+    list-style: none;
+  }
+  summary::-webkit-details-marker { display: none; }
+  .q { font-size: clamp(1.15rem, 1.8vw, 1.45rem); }
+  .mark {
+    font-family: var(--mono);
+    color: var(--grey);
+    transition: rotate 0.25s, color 0.25s;
+  }
+  details[open] .mark { rotate: 45deg; color: var(--amber); }
+  summary:hover .mark { color: var(--amber); }
+  .a {
+    color: var(--bone-dim);
+    font-size: 0.97rem;
+    max-width: var(--measure);
+    padding: 0 0 1.6rem;
+  }
+</style>

@@ -1,0 +1,54 @@
+---
+import Sub from '../layouts/Sub.astro';
+---
+
+<Sub
+  title="Användarvillkor — Scandic Marketing"
+  description="Villkor för användning av scandicmarketing.se."
+  fig="B"
+  figName="Användarvillkor"
+  heading="Användarvillkor"
+>
+  <div class="prose">
+    <h2>Allmänt</h2>
+    <p>
+      Dessa villkor gäller för webbplatsen www.scandicmarketing.se, som drivs av Scandic
+      Marketing i Helsingborg.
+    </p>
+
+    <h2>Innehåll</h2>
+    <p>
+      Innehållet på webbplatsen — text, bilder och grafik — tillhör Scandic Marketing och får
+      inte kopieras eller återanvändas utan skriftligt tillstånd.
+    </p>
+
+    <h2>Tjänster och avtal</h2>
+    <p>
+      Scandic Marketing erbjuder film, foto, hemsidor och digital marknadsföring. Uppdrag
+      regleras alltid i separata avtal mellan oss och kunden; priser och villkor på
+      webbplatsen är en inbjudan till kontakt, inte ett bindande erbjudande.
+    </p>
+
+    <h2>Ändringar</h2>
+    <p>
+      Villkoren kan uppdateras. Den senaste versionen finns alltid på den här sidan.
+    </p>
+  </div>
+</Sub>
+
+<style>
+  .prose {
+    max-width: var(--measure);
+    padding: clamp(3rem, 6vh, 4rem) 0 clamp(4rem, 9vh, 7rem);
+  }
+  .prose h2 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 1.35rem;
+    margin: 2.2rem 0 0.7rem;
+  }
+  .prose p {
+    color: var(--bone-dim);
+    font-size: 0.97rem;
+  }
+</style>

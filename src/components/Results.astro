@@ -1,0 +1,112 @@
+---
+/*
+  GATE FÖRE LANSERING: varje siffra nedan är ägarens egen uppgift från gamla
+  sajten och är ÄNNU INTE dokumenterad. Svensk marknadsföringsrätt (MD 2012:2)
+  lägger bevisbördan på annonsören — sektionen får inte publiceras förrän
+  ägaren visat underlag per siffra, eller siffran bytts/strukits.
+*/
+const stats = [
+  { v: '20M+', k: 'Omsättning genererad åt kunder' },
+  { v: '375%', k: 'Genomsnittlig ROI' },
+  { v: '100+', k: 'Genomförda samarbeten' },
+  { v: '8+', k: 'År av expertis' },
+];
+---
+
+<section class="results" id="resultat">
+  <div class="inner">
+    <p class="label section-label reveal">01 — Resultat</p>
+    <dl class="band reveal">
+      {
+        stats.map((s) => (
+          <div class="stat">
+            <dd class="display dash" data-count={s.v}>{s.v}</dd>
+            <dt class="label">{s.k}</dt>
+          </div>
+        ))
+      }
+    </dl>
+  </div>
+</section>
+
+<script>
+  // Count up once when the band scrolls into view. "20M+" → 0..20 + "M+".
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const els = document.querySelectorAll<HTMLElement>('.results dd[data-count]');
+  const run = (el: HTMLElement) => {
+    const target = el.dataset.count || '';
+    const m = target.match(/^(\d+)(.*)$/);
+    if (!m || reduced) return;
+    const end = parseInt(m[1], 10);
+    const suffix = m[2];
+    const dur = 1400;
+    const t0 = performance.now();
+    const tick = (t: number) => {
+      const p = Math.min((t - t0) / dur, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = String(Math.round(end * eased)) + suffix;
+      if (p < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  };
+  const io = new IntersectionObserver(
+    (entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting) {
+          run(e.target as HTMLElement);
+          io.unobserve(e.target);
+        }
+      }
+    },
+    { threshold: 0.4 }
+  );
+  els.forEach((el) => io.observe(el));
+</script>
+
+<style>
+  .results {
+    padding: clamp(4rem, 9vh, 6rem) 0 0;
+  }
+  .inner {
+    max-width: var(--page-max);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+  .section-label { margin-bottom: 2.5rem; }
+
+  .band {
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    border-top: 1px solid var(--hairline);
+    border-bottom: 1px solid var(--hairline);
+  }
+  .stat {
+    padding: 3rem 1.8rem 2.6rem;
+    border-left: 1px solid var(--hairline);
+  }
+  .stat:first-child { border-left: none; }
+  dd {
+    margin: 0;
+    font-size: clamp(3.2rem, 6.4vw, 5.6rem);
+    font-weight: 420;
+    line-height: 1;
+    color: var(--bone);
+  }
+  dt {
+    margin-top: 1.1rem;
+    color: var(--bone-dim);
+  }
+
+  @media (max-width: 860px) {
+    .band { grid-template-columns: 1fr 1fr; }
+    .stat:nth-child(3) { border-left: none; }
+    .stat { border-top: 1px solid var(--hairline); }
+    .stat:first-child, .stat:nth-child(2) { border-top: none; }
+  }
+  @media (max-width: 480px) {
+    .band { grid-template-columns: 1fr; }
+    .stat { border-left: none; }
+    .stat:nth-child(2) { border-top: 1px solid var(--hairline); }
+  }
+</style>

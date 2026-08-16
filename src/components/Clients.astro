@@ -1,0 +1,78 @@
+---
+/* GATE FÖRE LANSERING: skriftligt tillstånd per klient innan logotypen visas.
+   Alla märken visas som benvita silhuetter på den mörka bakgrunden. */
+const base = import.meta.env.BASE_URL.replace(/\/+$/, '');
+const logos = [
+  { src: `${base}/img/client-walleye.png`, alt: 'Walleye CrossFit' },
+  { src: `${base}/img/client-hantverkskollen-logo.png`, alt: 'Hantverkskollen' },
+  { src: `${base}/img/client-foodtel.svg`, alt: 'Foodtel' },
+  { src: `${base}/img/client-solna-logo.png`, alt: 'Solna Byggfirma & Hantverkare STHLM' },
+  { src: `${base}/img/client-excite-logo.png`, alt: 'Excite' },
+  { src: `${base}/img/client-saunavant-logo.png`, alt: 'Saunavant' },
+  { src: `${base}/img/client-prima-el-logo.png`, alt: 'Prima El' },
+];
+---
+
+<section class="clients" aria-label="Några av våra samarbeten">
+  <div class="inner reveal">
+    <p class="label">Några av våra samarbeten</p>
+    <ul>
+      {
+        logos.map((l) => (
+          <li>
+            <img src={l.src} alt={l.alt} loading="lazy" />
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .clients {
+    padding: clamp(2.5rem, 6vh, 4rem) 0 0;
+  }
+  .inner {
+    max-width: var(--page-max);
+    margin-inline: auto;
+    padding: 0 var(--gutter);
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+  }
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 2.1rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: clamp(1.2rem, 3vw, 3.5rem);
+    flex-wrap: nowrap;
+    border-top: 1px solid var(--hairline);
+    border-bottom: 1px solid var(--hairline);
+  }
+  li { min-width: 0; }
+  img {
+    height: clamp(1.3rem, 1.8vw, 2rem);
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+    opacity: 0.85;
+    filter: brightness(0) invert(0.92);
+    translate: 0 0;
+    transition: opacity 0.3s, filter 0.3s, translate 0.3s, scale 0.3s;
+  }
+  li:hover img {
+    opacity: 1;
+    /* benvit → varm bärnsten (≈ #d29054) */
+    filter: brightness(0) invert(0.68) sepia(0.55) saturate(3.4) hue-rotate(-12deg) brightness(1.12);
+    translate: 0 -4px;
+    scale: 1.05;
+  }
+
+  @media (max-width: 640px) {
+    ul { flex-wrap: wrap; justify-content: center; gap: 1.6rem 2.4rem; }
+    img { height: 1.6rem; }
+  }
+</style>

@@ -1,0 +1,184 @@
+---
+import { Image } from 'astro:assets';
+import dawn from '../assets/dawn.png';
+---
+<section class="hero">
+  <div class="hero-media" aria-hidden="true">
+    <!-- Gryningstoppen — sajtens enda berg, i hjälterollen. Uppgraderingsväg:
+         byt till <video> när nytt hero-material filmas (golden hour, Helsingborg). -->
+    <Image
+      src={dawn}
+      alt=""
+      widths={[960, 1600, 2400]}
+      sizes="100vw"
+      formats={['webp']}
+      quality={76}
+      loading="eager"
+      fetchpriority="high"
+    />
+    <div class="grade"></div>
+  </div>
+
+  <div class="hero-frame" aria-hidden="true">
+    <span class="corner br label">Fig. 01 — Översikt</span>
+    <span class="corner bl label">56.04°N&nbsp;&nbsp;12.69°E</span>
+  </div>
+
+  <div class="hero-content">
+    <p class="label kicker l0"><span class="tick" aria-hidden="true"></span>Marknadsföringsbyrå — Helsingborg</p>
+    <h1 class="display l1">Scandic Marketing<span class="dot">.</span></h1>
+    <p class="sub l2">
+      Film, foto, hemsidor och marknadsföring som går att mäta —
+      i&nbsp;Helsingborg och resten av Norden.
+    </p>
+    <div class="actions l3">
+      <a class="cta" href="#kontakt">Boka ett samtal <span aria-hidden="true">→</span></a>
+      <a class="ghost label" href="#tjanster">Se våra tjänster <span class="bounce" aria-hidden="true">↓</span></a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: 100svh;
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .hero-media {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
+  .hero-media :global(picture) {
+    position: absolute;
+    inset: 0;
+    display: block;
+  }
+  .hero-media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 58% 30%;
+    filter: brightness(0.82) contrast(1.04) saturate(0.98);
+    animation: settle 16s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  @keyframes settle {
+    from { scale: 1.07; }
+    to { scale: 1; }
+  }
+
+  /* Blend the film into the page at the seams,
+     and give the type a quiet ground to stand on. */
+  .grade {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(to bottom, rgba(19, 21, 23, 0.55), transparent 20%),
+      linear-gradient(to top, var(--ink) 0%, rgba(19, 21, 23, 0.6) 16%, transparent 48%),
+      linear-gradient(to right, rgba(19, 21, 23, 0.45), transparent 55%);
+  }
+
+  .hero-frame .corner {
+    position: absolute;
+    z-index: 2;
+    color: var(--bone-dim);
+  }
+  .corner.br { bottom: 1.6rem; right: var(--gutter); }
+  .corner.bl { bottom: 1.6rem; left: var(--gutter); }
+
+  .hero-content {
+    position: relative;
+    max-width: var(--page-max);
+    width: 100%;
+    margin-inline: auto;
+    padding: 0 var(--gutter) clamp(4rem, 10vh, 7rem);
+  }
+
+  .kicker {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    color: var(--bone-dim);
+    margin-bottom: 1.4rem;
+  }
+  .tick {
+    display: inline-block;
+    width: 2rem;
+    height: 2px;
+    background: var(--amber);
+  }
+
+  h1 {
+    font-size: clamp(2.7rem, 6.6vw, 5.2rem);
+  }
+  .dot { color: var(--amber); }
+
+  .sub {
+    margin-top: 1.3rem;
+    max-width: var(--measure);
+    color: var(--bone-dim);
+    text-wrap: balance;
+  }
+
+  .actions {
+    margin-top: 2.1rem;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+  .ghost {
+    color: var(--bone-dim);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .ghost:hover { color: var(--amber-bright); }
+  .bounce {
+    display: inline-block;
+    animation: bounce 1.8s ease-in-out infinite;
+  }
+  @keyframes bounce {
+    0%, 100% { translate: 0 0; }
+    30% { translate: 0 -4px; }
+    60% { translate: 0 2px; }
+  }
+
+  .cta {
+    display: inline-block;
+    padding: 0.85rem 1.5rem;
+    background: var(--amber);
+    color: var(--cta-text);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .cta:hover { background: var(--amber-bright); }
+
+  .l0, .l1, .l2, .l3 {
+    opacity: 0;
+    translate: 0 24px;
+    animation: rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  .l1 { animation-delay: 0.1s; }
+  .l2 { animation-delay: 0.22s; }
+  .l3 { animation-delay: 0.34s; }
+  @keyframes rise {
+    to { opacity: 1; translate: 0 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-media img { animation: none; }
+  }
+
+  @media (max-width: 640px) {
+    .corner.br { display: none; }
+  }
+</style>

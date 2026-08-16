@@ -1,0 +1,95 @@
+---
+import Sub from '../layouts/Sub.astro';
+
+const rows = [
+  {
+    k: 'Företagsporträtt',
+    v: 'Porträtt av er och ert team som ser ut som ni på en bra dag — inte som en stockbild.',
+  },
+  {
+    k: 'Produkt och mat',
+    v: 'Produktbilder och matfotografi för e-handel, menyer och kampanjer.',
+  },
+  {
+    k: 'Miljö och arkitektur',
+    v: 'Era lokaler, byggen och platser — fotograferade så att de bär på webben och i tryck.',
+  },
+  {
+    k: 'Event',
+    v: 'Dokumentation medan det händer, levererat snabbt efteråt.',
+  },
+];
+---
+
+<Sub
+  title="Fotografering i Helsingborg — Scandic Marketing"
+  description="Företagsporträtt, produktbilder, mat och miljöer. Fotograferat, retuscherat och levererat i rätt format för webb och tryck."
+  fig="04"
+  figName="Fotografi"
+  heading="Bilder som håller i både webb och tryck."
+  sub="Fotograferat med fullformatskamera och riktigt ljus, retuscherat för hand och levererat i de format ni faktiskt behöver."
+>
+  <section class="list">
+    <div class="rows">
+      {
+        rows.map((r) => (
+          <div class="row reveal">
+            <h2 class="display">{r.k}</h2>
+            <p>{r.v}</p>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="how reveal">
+    <p class="label">Så går det till</p>
+    <p class="how-text">
+      Berätta vad bilderna ska användas till, så föreslår vi ett upplägg och ett fast pris.
+      De flesta fotograferingar börjar runt 5&nbsp;000&nbsp;kr. Offert inom en arbetsdag.
+    </p>
+    <a class="cta" href="mailto:kontakt@scandicmarketing.se?subject=Fotografering"
+      >Begär offert <span aria-hidden="true">→</span></a
+    >
+  </section>
+</Sub>
+
+<style>
+  .list { padding-top: clamp(3rem, 7vh, 5rem); }
+  .rows { border-top: 1px solid var(--hairline); max-width: 52rem; }
+  .row {
+    display: grid;
+    grid-template-columns: 1fr 1.6fr;
+    gap: 2rem;
+    padding: 1.9rem 0;
+    border-bottom: 1px solid var(--hairline);
+  }
+  h2 { font-size: clamp(1.35rem, 2vw, 1.7rem); }
+  .row p { color: var(--bone-dim); font-size: 0.97rem; max-width: 34rem; }
+
+  .how { padding: clamp(3rem, 7vh, 5rem) 0 clamp(4rem, 9vh, 7rem); }
+  .how-text {
+    margin-top: 1.2rem;
+    max-width: var(--measure);
+    color: var(--bone-dim);
+  }
+  .cta {
+    display: inline-block;
+    margin-top: 2rem;
+    padding: 0.85rem 1.5rem;
+    background: var(--amber);
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .cta:hover { background: var(--amber-bright); }
+
+  @media (max-width: 640px) {
+    .row { grid-template-columns: 1fr; gap: 0.4rem; }
+  }
+</style>

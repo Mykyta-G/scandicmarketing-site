@@ -1,0 +1,26 @@
+---
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Contact from '../components/Contact.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<Base
+  title="Kontakta Scandic Marketing — Helsingborg"
+  description="Kontakta Scandic Marketing i Helsingborg: kontakt@scandicmarketing.se, +46 76 929 85 01, Redaregatan 48. Vi svarar inom en arbetsdag."
+>
+  <Nav />
+  <main class="kontakt-page">
+    <Contact />
+  </main>
+  <Footer />
+</Base>
+
+<style>
+  .kontakt-page {
+    min-height: 72svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+</style>

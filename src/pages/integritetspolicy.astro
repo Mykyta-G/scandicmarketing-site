@@ -1,0 +1,63 @@
+---
+import Sub from '../layouts/Sub.astro';
+---
+
+<Sub
+  title="Integritetspolicy — Scandic Marketing"
+  description="Så hanterar Scandic Marketing personuppgifter enligt GDPR."
+  fig="A"
+  figName="Integritetspolicy"
+  heading="Integritetspolicy"
+>
+  <div class="prose">
+    <h2>Personuppgiftsansvarig</h2>
+    <!-- TODO före lansering: riktigt organisationsnummer från ägaren. Aldrig personnummer. -->
+    <p>
+      Scandic Marketing<br />
+      Redaregatan 48, Helsingborg<br />
+      kontakt@scandicmarketing.se
+    </p>
+
+    <h2>Vilka uppgifter vi hanterar</h2>
+    <p>
+      Webbplatsen använder inga cookies och samlar inte in några personuppgifter. Ingen
+      tredjepartstjänst läser in data om dig när du besöker den.
+    </p>
+    <p>
+      Om du kontaktar oss via e-post eller telefon tar vi del av de uppgifter du själv lämnar,
+      till exempel namn, e-postadress och det du skriver. Uppgifterna används enbart för att
+      svara på din förfrågan och hantera ett eventuellt uppdrag.
+    </p>
+
+    <h2>Lagring</h2>
+    <p>
+      Vi sparar inte uppgifter längre än nödvändigt. Korrespondens raderas när ärendet är
+      avslutat, om inte bokförings- eller avtalsskäl kräver annat.
+    </p>
+
+    <h2>Dina rättigheter</h2>
+    <p>
+      Du kan när som helst begära utdrag, rättelse eller radering av de uppgifter vi har om
+      dig. Skriv till kontakt@scandicmarketing.se, så hjälper vi dig. Du har också rätt att
+      lämna klagomål till Integritetsskyddsmyndigheten (IMY).
+    </p>
+  </div>
+</Sub>
+
+<style>
+  .prose {
+    max-width: var(--measure);
+    padding: clamp(3rem, 6vh, 4rem) 0 clamp(4rem, 9vh, 7rem);
+  }
+  .prose h2 {
+    font-family: var(--serif);
+    font-weight: 400;
+    font-size: 1.35rem;
+    margin: 2.2rem 0 0.7rem;
+  }
+  .prose p {
+    color: var(--bone-dim);
+    font-size: 0.97rem;
+  }
+  .prose p + p { margin-top: 0.8rem; }
+</style>

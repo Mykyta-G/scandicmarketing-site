@@ -1,0 +1,85 @@
+---
+---
+<section class="contact" id="kontakt">
+  <div class="inner">
+    <p class="label section-label reveal">06 — Kontakt</p>
+    <h2 class="display dash reveal">Berätta vad ni vill bygga.</h2>
+
+    <div class="rows reveal">
+      <a class="row" href="mailto:kontakt@scandicmarketing.se">
+        <span class="label k">E-post</span>
+        <span class="v">kontakt@scandicmarketing.se</span>
+      </a>
+      <a class="row" href="tel:+46769298501">
+        <span class="label k">Telefon</span>
+        <span class="v">+46 76 929 85 01</span>
+      </a>
+      <div class="row">
+        <span class="label k">Kontor</span>
+        <span class="v">Redaregatan 48, Helsingborg</span>
+      </div>
+      <div class="row">
+        <span class="label k">Öppet</span>
+        <span class="v">Vardagar 09–17</span>
+      </div>
+    </div>
+
+    <a class="cta reveal" href="mailto:kontakt@scandicmarketing.se?subject=Boka%20ett%20samtal"
+      >Boka ett samtal <span aria-hidden="true">→</span></a
+    >
+  </div>
+</section>
+
+<style>
+  .contact {
+    padding: clamp(5rem, 14vh, 10rem) 0 clamp(4rem, 10vh, 7rem);
+  }
+  .inner {
+    max-width: var(--page-max);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+  .section-label { margin-bottom: 2.5rem; }
+
+  h2 {
+    font-size: clamp(2.2rem, 4.6vw, 3.8rem);
+    max-width: 14em;
+    margin-bottom: 3rem;
+  }
+
+  .rows {
+    border-top: 1px solid var(--hairline);
+    max-width: 44rem;
+  }
+  .row {
+    display: grid;
+    grid-template-columns: 7rem 1fr;
+    gap: 2rem;
+    align-items: baseline;
+    padding: 1.15rem 0;
+    border-bottom: 1px solid var(--hairline);
+    text-decoration: none;
+  }
+  .v { color: var(--bone); font-size: 1.05rem; transition: color 0.2s; }
+  a.row:hover .v { color: var(--amber-bright); }
+
+  .cta {
+    display: inline-block;
+    margin-top: 2.6rem;
+    padding: 0.85rem 1.5rem;
+    background: var(--amber);
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .cta:hover { background: var(--amber-bright); }
+
+  @media (max-width: 640px) {
+    .row { grid-template-columns: 1fr; gap: 0.2rem; }
+  }
+</style>

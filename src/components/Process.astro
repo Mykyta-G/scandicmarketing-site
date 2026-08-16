@@ -1,0 +1,72 @@
+---
+const steps = [
+  {
+    n: '1',
+    name: 'Kartläggning',
+    text: 'Vi träffas och går igenom er verksamhet: vad ni säljer, vem som ska hitta er och vad som räknas som resultat. Det skriver vi ner — så att båda sidor mäter samma sak.',
+  },
+  {
+    n: '2',
+    name: 'Produktion',
+    text: 'Vi filmar, fotograferar och bygger. Litet team, snabba beslut, korta vändor — ni ser arbetet medan det växer fram, inte först vid leveransen.',
+  },
+  {
+    n: '3',
+    name: 'Avläsning',
+    text: 'Ni får det färdiga materialet och en ärlig genomgång av vad siffrorna faktiskt visar. Det som fungerar gör vi mer av. Det som inte gör det säger vi högt.',
+  },
+];
+---
+
+<section class="process" id="process">
+  <div class="inner">
+    <p class="label section-label reveal">04 — Så arbetar vi</p>
+    <ol class="steps">
+      {
+        steps.map((s) => (
+          <li class="reveal">
+            <span class="label n">Steg {s.n}</span>
+            <h3 class="display dash">{s.name}</h3>
+            <p class="text">{s.text}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .process {
+    padding: clamp(5rem, 12vh, 9rem) 0;
+  }
+  .inner {
+    max-width: var(--page-max);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+  .section-label { margin-bottom: 2.5rem; }
+
+  .steps {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 3rem;
+  }
+  .steps li {
+    border-left: 1px solid var(--hairline);
+    padding-left: 1.6rem;
+  }
+  h3 {
+    font-size: clamp(1.4rem, 2vw, 1.8rem);
+    margin: 0.7rem 0 0.9rem;
+  }
+  .text {
+    color: var(--bone-dim);
+    font-size: 0.97rem;
+  }
+
+  @media (max-width: 760px) {
+    .steps { grid-template-columns: 1fr; gap: 2.4rem; }
+  }
+</style>

@@ -1,0 +1,124 @@
+---
+import Sub from '../layouts/Sub.astro';
+
+const packages = [
+  {
+    name: 'Hemsida Pro',
+    price: '499 kr/mån',
+    note: 'Lanseringspris. 12 mån avtal, ex. moms.',
+    features: [
+      'Skräddarsydd design',
+      'Upp till 5 undersidor',
+      'Sökmotoroptimering',
+      'Domän ingår',
+      'Support och underhåll ingår',
+    ],
+  },
+  {
+    name: 'Hemsida Premium',
+    price: '1 499 kr/mån',
+    note: 'Lanseringspris. 12 mån avtal, ex. moms.',
+    features: [
+      'Skräddarsydd design',
+      'Upp till 15 undersidor',
+      'Avancerad sökmotoroptimering',
+      'Domän och e-postadress ingår',
+      'Prioriterad support och underhåll',
+    ],
+  },
+];
+---
+
+<Sub
+  title="Hemsidor till fast månadspris — Scandic Marketing Helsingborg"
+  description="Snabba, sökmotorvänliga hemsidor till fast månadspris. Design, utveckling, domän och underhåll ingår. Byggda i Helsingborg."
+  fig="02"
+  figName="Hemsidor"
+  heading="En hemsida som är byggd för att hittas."
+  sub="Design, utveckling, domän och underhåll — till ett fast månadspris, utan startavgift. Ni äger innehållet, vi håller den snabb."
+>
+  <section class="packages">
+    {
+      packages.map((p) => (
+        <article class="pkg reveal">
+          <h2 class="display">{p.name}</h2>
+          <p class="price display">{p.price}</p>
+          <p class="label note">{p.note}</p>
+          <ul>
+            {p.features.map((f) => (
+              <li>{f}</li>
+            ))}
+          </ul>
+          <a
+            class="cta"
+            href={`mailto:kontakt@scandicmarketing.se?subject=${encodeURIComponent(p.name)}`}
+          >
+            Kom igång <span aria-hidden="true">→</span>
+          </a>
+        </article>
+      ))
+    }
+  </section>
+  <p class="fine reveal">
+    Alla priser är exklusive moms. Avtalslängden kan kortas mot en högre månadsavgift —
+    fråga oss, så räknar vi på det.
+  </p>
+</Sub>
+
+<style>
+  .packages {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    padding: clamp(3rem, 7vh, 5rem) 0 2rem;
+  }
+  .pkg {
+    border-left: 1px solid var(--hairline);
+    padding-left: 1.8rem;
+  }
+  h2 { font-size: 1.7rem; }
+  .price {
+    font-size: clamp(2rem, 3.4vw, 2.8rem);
+    color: var(--bone);
+    margin-top: 0.9rem;
+  }
+  .note { margin-top: 0.5rem; }
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 1.8rem 0 0;
+    border-top: 1px solid var(--hairline);
+  }
+  li {
+    padding: 0.7rem 0;
+    border-bottom: 1px solid var(--hairline);
+    color: var(--bone-dim);
+    font-size: 0.97rem;
+  }
+  .cta {
+    display: inline-block;
+    margin-top: 1.8rem;
+    padding: 0.85rem 1.5rem;
+    background: var(--amber);
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .cta:hover { background: var(--amber-bright); }
+
+  .fine {
+    color: var(--grey);
+    font-size: 0.85rem;
+    max-width: var(--measure);
+    padding-bottom: clamp(4rem, 9vh, 7rem);
+  }
+
+  @media (max-width: 760px) {
+    .packages { grid-template-columns: 1fr; }
+  }
+</style>

@@ -1,0 +1,128 @@
+---
+const base = import.meta.env.BASE_URL.replace(/\/+$/, '');
+---
+<header class="nav" id="site-nav">
+  <div class="nav-inner">
+    <a href={`${base}/`} class="wordmark">
+      <img src={`${base}/img/logo-white.webp`} alt="Scandic Marketing" width="129" height="40" />
+    </a>
+    <nav class="nav-center" aria-label="Huvudmeny">
+      <a href={`${base}/`} class="nav-link">Hem</a>
+      <a href={`${base}/#tjanster`} class="nav-link">Tjänster</a>
+      <a href={`${base}/#resultat`} class="nav-link">Resultat</a>
+      <a href={`${base}/#kontakt`} class="nav-link">Kontakt</a>
+    </nav>
+    <a href={`${base}/#kontakt`} class="nav-cta">Boka ett samtal <span aria-hidden="true">→</span></a>
+  </div>
+  <div class="rule">
+    <div class="ticks" aria-hidden="true"></div>
+  </div>
+</header>
+
+<script>
+  const nav = document.getElementById('site-nav');
+  let ticking = false;
+  const update = () => {
+    nav?.classList.toggle('scrolled', scrollY > 40);
+    ticking = false;
+  };
+  addEventListener(
+    'scroll',
+    () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(update);
+      }
+    },
+    { passive: true }
+  );
+  update();
+</script>
+
+<style>
+  .nav {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 50;
+    transition: background 0.3s;
+  }
+  .nav.scrolled {
+    background: rgba(19, 21, 23, 0.82);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+
+  .nav-inner {
+    max-width: var(--page-max);
+    margin-inline: auto;
+    padding: 0.95rem var(--gutter);
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  .wordmark { justify-self: start; }
+  .wordmark img { height: 2.1rem; width: auto; }
+
+  .nav-center {
+    display: flex;
+    align-items: center;
+    gap: 2.2rem;
+  }
+  .nav-cta { justify-self: end; }
+  .nav-link {
+    position: relative;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--bone-dim);
+    transition: color 0.2s;
+  }
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -6px;
+    height: 2px;
+    background: var(--amber);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .nav-link:hover { color: var(--bone); }
+  .nav-link:hover::after { transform: scaleX(1); }
+
+  .nav-cta {
+    padding: 0.6rem 1.1rem;
+    background: var(--amber);
+    color: var(--cta-text);
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background 0.2s;
+  }
+  .nav-cta:hover { background: var(--amber-bright); }
+
+  .rule { border-top: 1px solid var(--hairline); }
+  .ticks {
+    height: 7px;
+    background: repeating-linear-gradient(to right, var(--hairline) 0 1px, transparent 1px 72px);
+    mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+    transition: opacity 0.3s;
+  }
+  .nav.scrolled .ticks { opacity: 0; }
+
+  @media (max-width: 860px) {
+    .nav-center { display: none; }
+    .nav-inner { grid-template-columns: auto 1fr; }
+    .nav-cta { font-size: 0.68rem; padding: 0.55rem 0.9rem; }
+  }
+</style>

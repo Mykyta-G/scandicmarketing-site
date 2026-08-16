@@ -1,0 +1,52 @@
+---
+import Base from './Base.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  fig: string;
+  figName: string;
+  heading: string;
+  sub?: string;
+}
+
+const { title, description, fig, figName, heading, sub } = Astro.props;
+---
+
+<Base title={title} description={description}>
+  <slot name="head" slot="head" />
+  <Nav />
+  <main class="sub">
+    <header class="sub-head">
+      <p class="label fig">Fig. {fig} — {figName}</p>
+      <h1 class="display">{heading}</h1>
+      {sub && <p class="sub-text">{sub}</p>}
+    </header>
+    <slot />
+  </main>
+  <Footer />
+</Base>
+
+<style>
+  .sub {
+    max-width: var(--page-max);
+    margin-inline: auto;
+    padding: 0 var(--gutter);
+  }
+  .sub-head {
+    padding: clamp(8rem, 18vh, 12rem) 0 clamp(3rem, 7vh, 5rem);
+    border-bottom: 1px solid var(--hairline);
+  }
+  .fig { margin-bottom: 2rem; }
+  h1 {
+    font-size: clamp(2.4rem, 5.4vw, 4.2rem);
+    max-width: 15em;
+  }
+  .sub-text {
+    margin-top: 1.3rem;
+    max-width: var(--measure);
+    color: var(--bone-dim);
+  }
+</style>

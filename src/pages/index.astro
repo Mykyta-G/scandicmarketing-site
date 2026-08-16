@@ -1,0 +1,55 @@
+---
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Hero from '../components/Hero.astro';
+import Clients from '../components/Clients.astro';
+import Results from '../components/Results.astro';
+import Services from '../components/Services.astro';
+import Cases from '../components/Cases.astro';
+import Break from '../components/Break.astro';
+import Process from '../components/Process.astro';
+import Faq from '../components/Faq.astro';
+import Contact from '../components/Contact.astro';
+import Footer from '../components/Footer.astro';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfessionalService',
+  name: 'Scandic Marketing',
+  description:
+    'Marknadsföringsbyrå i Helsingborg: film, foto, hemsidor och digital marknadsföring.',
+  url: 'https://www.scandicmarketing.se',
+  email: 'kontakt@scandicmarketing.se',
+  telephone: '+46769298501',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Redaregatan 48',
+    addressLocality: 'Helsingborg',
+    addressCountry: 'SE',
+  },
+  geo: { '@type': 'GeoCoordinates', latitude: 56.0405, longitude: 12.6922 },
+  openingHours: 'Mo-Fr 09:00-17:00',
+  sameAs: ['https://www.instagram.com/scandicmarketing.se/'],
+  areaServed: ['Helsingborg', 'Skåne', 'Sverige', 'Norden'],
+};
+---
+
+<Base
+  title="Scandic Marketing — Film, foto och hemsidor i Helsingborg"
+  description="Scandic Marketing är en marknadsföringsbyrå i Helsingborg som gör film, foto, hemsidor och digital marknadsföring för företag i Skåne och Norden."
+>
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  <Nav />
+  <main>
+    <Hero />
+    <Clients />
+    <Results />
+    <Services />
+    <Cases />
+    <Break />
+    <Process />
+    <Faq />
+    <Contact />
+  </main>
+  <Footer />
+</Base>

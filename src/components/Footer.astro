@@ -1,0 +1,167 @@
+---
+const base = import.meta.env.BASE_URL.replace(/\/+$/, '');
+---
+<footer class="footer">
+  <div class="rule"><div class="ticks" aria-hidden="true"></div></div>
+
+  <div class="inner">
+    <div class="col brand">
+      <img src={`${base}/img/logo-white.webp`} alt="Scandic Marketing" width="129" height="40" />
+      <p class="tagline">
+        Film, foto, hemsidor och marknadsföring som går att mäta —
+        i Helsingborg och resten av Norden.
+      </p>
+      <ul class="contact-list">
+        <li><a href="mailto:kontakt@scandicmarketing.se">kontakt@scandicmarketing.se</a></li>
+        <li><a href="tel:+46769298501">+46 76 929 85 01</a></li>
+        <li>Redaregatan 48, Helsingborg</li>
+      </ul>
+    </div>
+
+    <nav class="col" aria-label="Snabblänkar">
+      <p class="label head">Snabblänkar</p>
+      <ul>
+        <li><a href={`${base}/`}>Hem</a></li>
+        <li><a href={`${base}/#tjanster`}>Tjänster</a></li>
+        <li><a href={`${base}/#resultat`}>Resultat</a></li>
+        <li><a href={`${base}/#arbete`}>Framgångshistorier</a></li>
+        <li><a href={`${base}/#kontakt`}>Kontakt</a></li>
+      </ul>
+    </nav>
+
+    <nav class="col" aria-label="Våra tjänster">
+      <p class="label head">Våra tjänster</p>
+      <ul>
+        <li><a href={`${base}/videoproduktion`}>Videoproduktion & drönare</a></li>
+        <li><a href={`${base}/fotografi`}>Fotografering & branding</a></li>
+        <li><a href={`${base}/hemsida`}>Hemsidor & SEO</a></li>
+        <li><a href={`${base}/#kontakt`}>Digital marknadsföring</a></li>
+      </ul>
+    </nav>
+
+    <div class="col">
+      <p class="label head">Följ oss</p>
+      <ul>
+        <li><a href="https://www.instagram.com/scandicmarketing.se/" rel="noopener">Instagram</a></li>
+      </ul>
+      <p class="label head hours-head">Öppet</p>
+      <p class="hours">Vardagar 09–17<br />Svar inom en arbetsdag</p>
+      <a class="mini-cta" href={`${base}/#kontakt`}>Boka ett samtal <span aria-hidden="true">→</span></a>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <div class="bottom-inner">
+      <p class="muted">© 2026 Scandic Marketing</p>
+      <nav class="legal" aria-label="Juridik">
+        <a href={`${base}/integritetspolicy`}>Integritetspolicy</a>
+        <a href={`${base}/anvandarvillkor`}>Användarvillkor</a>
+      </nav>
+      <p class="label sig">56.04°N&nbsp;&nbsp;12.69°E</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .rule { border-top: 1px solid var(--hairline); }
+  .ticks {
+    height: 7px;
+    background: repeating-linear-gradient(to right, var(--hairline) 0 1px, transparent 1px 72px);
+    mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
+  }
+
+  .inner {
+    max-width: var(--page-max);
+    margin-inline: auto;
+    padding: 3.2rem var(--gutter) 2.6rem;
+    display: grid;
+    grid-template-columns: 1.6fr 1fr 1fr 1fr;
+    gap: 3rem;
+  }
+
+  .brand img { height: 2.1rem; width: auto; }
+  .tagline {
+    margin-top: 1.2rem;
+    color: var(--bone-dim);
+    font-size: 0.92rem;
+    max-width: 22rem;
+  }
+  .contact-list {
+    list-style: none;
+    margin: 1.4rem 0 0;
+    padding: 0;
+  }
+  .contact-list li {
+    color: var(--bone-dim);
+    font-size: 0.92rem;
+    padding: 0.25rem 0;
+  }
+  .contact-list a {
+    color: var(--bone-dim);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .contact-list a:hover { color: var(--amber-bright); }
+
+  .head { margin-bottom: 1rem; }
+  .col ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .col ul li { padding: 0.28rem 0; }
+  .col ul a {
+    color: var(--bone-dim);
+    font-size: 0.92rem;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .col ul a:hover { color: var(--amber-bright); }
+
+  .hours-head { margin-top: 1.6rem; }
+  .hours { color: var(--bone-dim); font-size: 0.92rem; }
+  .mini-cta {
+    display: inline-block;
+    margin-top: 1.5rem;
+    padding: 0.7rem 1.2rem;
+    background: var(--amber);
+    color: var(--cta-text);
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .mini-cta:hover { background: var(--amber-bright); }
+
+  .bottom { border-top: 1px solid var(--hairline); }
+  .bottom-inner {
+    max-width: var(--page-max);
+    margin-inline: auto;
+    padding: 1.3rem var(--gutter);
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .muted { color: var(--grey); font-size: 0.82rem; }
+  .legal { display: flex; gap: 1.6rem; }
+  .legal a {
+    color: var(--grey);
+    font-size: 0.82rem;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .legal a:hover { color: var(--bone); }
+  .sig { color: var(--grey); }
+
+  @media (max-width: 900px) {
+    .inner { grid-template-columns: 1fr 1fr; gap: 2.4rem; }
+  }
+  @media (max-width: 520px) {
+    .inner { grid-template-columns: 1fr; }
+  }
+</style>

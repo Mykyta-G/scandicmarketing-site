@@ -1,0 +1,118 @@
+---
+import { Image } from 'astro:assets';
+import survey from '../assets/survey.png';
+---
+
+<section class="break" aria-label="Bra marknadsföring märks. Vår mäts.">
+  <div class="break-media" aria-hidden="true">
+    <!-- Uppmätt berg i modell — mätbarhet som bild. -->
+    <Image
+      src={survey}
+      alt=""
+      widths={[960, 1600, 2400]}
+      sizes="100vw"
+      quality={72}
+      loading="lazy"
+    />
+    <div class="grade"></div>
+  </div>
+  <div class="content reveal">
+    <p class="line display">
+      Bra marknadsföring <span class="hl">märks</span><span class="dot">.</span><br />
+      Vår <span class="hl">mäts</span><span class="dot">.</span>
+    </p>
+    <a class="cta" href="#kontakt">Boka ett samtal <span aria-hidden="true">→</span></a>
+  </div>
+</section>
+
+<script>
+  // Whisper of parallax: image drifts slower than the scroll.
+  const media = document.querySelector('.break-media img');
+  const section = document.querySelector('.break');
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (media && section && !reduced && matchMedia('(min-width: 760px)').matches) {
+    let ticking = false;
+    const update = () => {
+      const r = section.getBoundingClientRect();
+      const progress = (r.top + r.height / 2 - innerHeight / 2) / innerHeight;
+      (media as HTMLElement).style.transform = `translateY(${progress * 6}%)`;
+      ticking = false;
+    };
+    addEventListener(
+      'scroll',
+      () => {
+        if (!ticking) {
+          ticking = true;
+          requestAnimationFrame(update);
+        }
+      },
+      { passive: true }
+    );
+    update();
+  }
+</script>
+
+<style>
+  .break {
+    position: relative;
+    min-height: 56svh;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .break-media {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
+  .break-media :global(picture) {
+    position: absolute;
+    inset: 0;
+    display: block;
+  }
+  .break-media :global(img) {
+    width: 100%;
+    height: 112%;
+    object-fit: cover;
+    object-position: 50% 55%;
+    filter: brightness(0.62) contrast(1.1) saturate(0.9);
+    will-change: transform;
+  }
+  .grade {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(to top, var(--ink), transparent 24%),
+      linear-gradient(to bottom, var(--ink), transparent 24%),
+      rgba(19, 21, 23, 0.3);
+  }
+
+  .content {
+    position: relative;
+    text-align: center;
+    padding: 3.5rem var(--gutter);
+  }
+  .line {
+    color: var(--on-photo);
+    font-size: clamp(1.9rem, 4.2vw, 3.4rem);
+    text-shadow: 0 1px 24px rgba(19, 21, 23, 0.55);
+  }
+  .line .dot { color: var(--amber); }
+
+  .cta {
+    display: inline-block;
+    margin-top: 2.4rem;
+    padding: 0.85rem 1.5rem;
+    background: var(--amber);
+    color: var(--cta-text);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: background 0.2s;
+  }
+  .cta:hover { background: var(--amber-bright); }
+</style>
