@@ -157,7 +157,9 @@ const base = import.meta.env.BASE_URL.replace(/\/+$/, '');
 
   @media (max-width: 900px) {
     .cols { grid-template-columns: 1fr; }
-    .right { min-height: 14rem; order: -1; }
+    /* Ingen reserverad yta på smalt: formationen ritas ändå i fast canvas
+       bakom innehållet, och en tom platshållare blev bara ett hål. */
+    .right { display: none; }
     .go { opacity: 1; translate: 0 0; }
   }
 </style>

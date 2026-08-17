@@ -106,9 +106,11 @@ const stats = [
     .stat { border-top: 1px solid var(--hairline); }
     .stat:first-child, .stat:nth-child(2) { border-top: none; }
   }
+  /* Stannar i 2×2 även på telefon — en enspaltig stapel blev nästan
+     tusen pixlar hög för fyra siffror. Luftare tar vi ner med. */
   @media (max-width: 480px) {
-    .band { grid-template-columns: 1fr; }
-    .stat { border-left: none; }
-    .stat:nth-child(2) { border-top: 1px solid var(--hairline); }
+    .stat { padding: 1.9rem 1.1rem 1.6rem; }
+    dd { font-size: 2.6rem; }
+    dt { margin-top: 0.7rem; font-size: 0.62rem; letter-spacing: 0.1em; }
   }
 </style>
