@@ -317,6 +317,46 @@ export function initField(canvas: HTMLCanvasElement | null) {
       return out;
     }
 
+    if (name === 'steps') {
+      /* Så arbetar vi: en stigande bana över hela bredden med tre hållpunkter
+         — kartläggning, produktion, avläsning. Ligger lågt i bilden så den
+         inte krockar med stegtexten. */
+      const out: number[] = [];
+      const x0 = W * 0.06, x1 = W * 0.94;
+      const yLo = H * 0.88, yHi = H * 0.62;
+      const stops = [0.08, 0.5, 0.92];
+      const pathY = (u: number) =>
+        yLo + (yHi - yLo) * (u * u * (3 - 2 * u)) + Math.sin(u * TAU * 1.4) * H * 0.012;
+
+      // banan
+      const pts = 900;
+      for (let i = 0; i < pts; i++) {
+        const u = i / pts;
+        out.push(x0 + (x1 - x0) * u, pathY(u) + (rr() - 0.5) * H * 0.008);
+      }
+
+      // hållpunkter: en ring per steg, den sista fylld
+      for (let s = 0; s < stops.length; s++) {
+        const u = stops[s];
+        const cx = x0 + (x1 - x0) * u;
+        const cy = pathY(u);
+        const rad = Math.min(W, H) * 0.045;
+        const ring = 190;
+        for (let i = 0; i < ring; i++) {
+          const a = (i / ring) * TAU;
+          out.push(cx + Math.cos(a) * rad, cy + Math.sin(a) * rad);
+        }
+        if (s === stops.length - 1) {
+          for (let i = 0; i < 120; i++) {
+            const a = rr() * TAU;
+            const d = Math.sqrt(rr()) * rad * 0.5;
+            out.push(cx + Math.cos(a) * d, cy + Math.sin(a) * d);
+          }
+        }
+      }
+      return out;
+    }
+
     if (name === 'converge') {
       // fyllotaxi-spiral — allt samlas i en punkt
       const out: number[] = [];
@@ -336,7 +376,7 @@ export function initField(canvas: HTMLCanvasElement | null) {
   }
 
   const GOALS: Record<string, number> = {
-    logo: 1.12, drift: 0.42, bars: 0.62, shapes: 0.62, wave: 0.72, converge: 0.72,
+    logo: 1.12, drift: 0.42, bars: 0.62, shapes: 0.62, wave: 0.72, steps: 0.68, converge: 0.72,
   };
 
   let shapesEl: Element | null = null;
