@@ -1,63 +1,61 @@
 ---
-/* Kortens bilder är hämtade från ägarens nuvarande sajt (hans val av bildspråk).
-   OBS före lansering: verifiera licensen för dessa bilder (troligen stockbilder
-   han köpt/laddat ner) — byts helst mot riktiga produktionsstillbilder. */
-const base = import.meta.env.BASE_URL.replace(/\/+$/, '');
-const services = [
+/* En enda tjänst: marknadsföring. Ägaren säljer inte film, foto eller
+   hemsidor separat — hans egen sajt listar ett kort, "Marknadsföring".
+   Punkterna nedan är hämtade ur hans befintliga marknadsföringstext.
+   Inga bilder här: korten låg tidigare på stockfoton, vilket var just det
+   han anmärkte på. */
+const includes = [
   {
     n: '01',
-    name: 'Film',
-    text: 'Reklamfilm, företagsfilm och innehåll för sociala medier — filmat i 4K, färdigt att publicera.',
-    href: `${base}/videoproduktion`,
-    img: `${base}/img/service-film.webp`,
-    pos: '50% 50%',
+    name: 'Strategi och målgrupp',
+    text: 'Grundlig analys av er nuvarande situation och målgrupp, och en komplett marknadsföringsstrategi byggd för långsiktig tillväxt.',
   },
   {
     n: '02',
-    name: 'Foto',
-    text: 'Företagsporträtt, produktbilder, mat och miljöer — retuscherat och levererat för webb och tryck.',
-    href: `${base}/fotografi`,
-    img: `${base}/img/service-foto.webp`,
-    pos: '50% 50%',
+    name: 'Sökmotoroptimering',
+    text: 'SEO som gör att kunderna hittar er på Google — teknik, innehåll och struktur.',
   },
   {
     n: '03',
-    name: 'Hemsidor',
-    text: 'Snabba, sökmotorvänliga hemsidor till fast månadspris — domän och underhåll ingår.',
-    href: `${base}/hemsida`,
-    img: `${base}/img/service-hemsidor.webp`,
-    pos: '50% 50%',
+    name: 'Digital annonsering',
+    text: 'Google Ads och annonsering i sociala medier, med budgeten följd och optimerad löpande.',
   },
   {
     n: '04',
-    name: 'Marknadsföring',
-    text: 'SEO, annonsering och sociala medier — med resultat som mäts mot verkliga siffror.',
-    href: '#kontakt',
-    img: `${base}/img/service-marknad.webp`,
-    pos: '50% 50%',
+    name: 'Sociala medier och innehåll',
+    text: 'Innehåll som engagerar er målgrupp, planerat och publicerat kontinuerligt.',
+  },
+  {
+    n: '05',
+    name: 'Uppföljning',
+    text: 'Regelbundna rapporter med tydliga resultat och insikter — och optimering utifrån dem.',
   },
 ];
 ---
 
-<section class="services" id="tjanster">
+<section class="services" id="tjanster" data-field="shapes">
   <div class="inner">
     <p class="label section-label reveal">02 — Tjänster</p>
-    <div class="grid">
+
+    <div class="offer">
+      <h2 class="display dash reveal">Digital marknadsföring<span class="dot">.</span></h2>
+      <p class="lead reveal">
+        SEO, annonsering och sociala medier — med resultat som mäts mot verkliga siffror.
+      </p>
+    </div>
+
+    <p class="label includes-label reveal">I arbetet ingår</p>
+    <ol class="grid" data-stagger>
       {
-        services.map((s) => (
-          <a class="card reveal" href={s.href}>
-            <img src={s.img} alt="" loading="lazy" width="900" height="1050" style={`object-position:${s.pos}`} />
-            <div class="shade" aria-hidden="true"></div>
-            <span class="label n">{s.n}</span>
-            <div class="body">
-              <h3 class="display">{s.name}</h3>
-              <p class="text">{s.text}</p>
-              <span class="go label" aria-hidden="true">Läs mer →</span>
-            </div>
-          </a>
+        includes.map((s) => (
+          <li class="card reveal reveal-clip">
+            <span class="label n" aria-hidden="true">{s.n}</span>
+            <h3 class="display">{s.name}</h3>
+            <p class="text">{s.text}</p>
+          </li>
         ))
       }
-    </div>
+    </ol>
   </div>
 </section>
 
@@ -72,81 +70,59 @@ const services = [
   }
   .section-label { margin-bottom: 2.5rem; }
 
+  .offer h2 {
+    font-size: clamp(2.2rem, 4.6vw, 3.8rem);
+    max-width: 16ch;
+  }
+  .dot { color: var(--accent); }
+  .lead {
+    margin-top: 1.4rem;
+    max-width: var(--measure);
+    color: var(--type-dim);
+    font-size: 1.1rem;
+  }
+
+  .includes-label {
+    margin: clamp(2.5rem, 6vh, 4rem) 0 1.4rem;
+  }
+
   .grid {
+    list-style: none;
+    margin: 0;
+    padding: 0;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 1.1rem;
   }
+  @media (max-width: 1000px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
 
   .card {
-    position: relative;
-    aspect-ratio: 3 / 4.1;
-    overflow: hidden;
-    display: flex;
-    align-items: flex-end;
-    text-decoration: none;
-    isolation: isolate;
-    outline: 1px solid var(--hairline);
-    outline-offset: -1px;
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+    padding: 1.5rem 1.4rem 1.6rem;
+    transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), translate 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  .card img {
-    position: absolute;
-    inset: 0;
-    z-index: -2;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    filter: brightness(0.78) contrast(1.05) saturate(0.85);
-    transition: scale 0.7s cubic-bezier(0.22, 1, 0.36, 1), filter 0.7s;
-  }
-  .card:hover img {
-    scale: 1.045;
-    filter: brightness(0.9) contrast(1.05) saturate(0.95);
-  }
-  .shade {
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background: linear-gradient(to top, rgba(19, 21, 23, 0.88) 0%, rgba(19, 21, 23, 0.25) 45%, transparent 70%);
-  }
+  .card:hover { box-shadow: var(--shadow-medium); translate: 0 -3px; }
 
   .n {
-    position: absolute;
-    top: 1.1rem;
-    left: 1.2rem;
-    color: var(--on-photo);
-    opacity: 0.75;
+    display: block;
+    color: var(--accent);
+    margin-bottom: 1.4rem;
   }
 
-  .body {
-    padding: 1.2rem 1.2rem 1.3rem;
-  }
   h3 {
-    color: var(--on-photo);
-    font-size: clamp(1.5rem, 2.2vw, 2rem);
+    font-size: 1.22rem;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+    line-height: 1.25;
+    text-wrap: balance;
   }
   .text {
-    margin-top: 0.55rem;
-    color: rgba(233, 230, 224, 0.78);
-    font-size: 0.88rem;
-    line-height: 1.5;
-  }
-  .go {
-    display: inline-block;
-    margin-top: 0.9rem;
-    color: var(--amber);
-    opacity: 0;
-    translate: -6px 0;
-    transition: opacity 0.3s, translate 0.3s;
-  }
-  .card:hover .go { opacity: 1; translate: 0 0; }
-
-  @media (max-width: 980px) {
-    .grid { grid-template-columns: 1fr 1fr; }
-  }
-  @media (max-width: 520px) {
-    .grid { grid-template-columns: 1fr; }
-    .card { aspect-ratio: 4 / 3; }
-    .go { opacity: 1; translate: 0 0; }
+    margin-top: 0.6rem;
+    color: var(--type-dim);
+    font-size: 0.92rem;
+    line-height: 1.55;
   }
 </style>

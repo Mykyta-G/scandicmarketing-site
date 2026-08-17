@@ -1,9 +1,9 @@
 ---
 ---
-<section class="contact" id="kontakt">
+<section class="contact" id="kontakt" data-field="converge">
   <div class="inner">
-    <p class="label section-label reveal">06 — Kontakt</p>
-    <h2 class="display dash reveal">Berätta vad ni vill bygga.</h2>
+    <p class="label section-label reveal">05 — Kontakt</p>
+    <h2 class="display dash split">Berätta vad ni vill bygga.</h2>
 
     <div class="rows reveal">
       <a class="row" href="mailto:kontakt@scandicmarketing.se">
@@ -60,24 +60,26 @@
     border-bottom: 1px solid var(--hairline);
     text-decoration: none;
   }
-  .v { color: var(--bone); font-size: 1.05rem; transition: color 0.2s; }
-  a.row:hover .v { color: var(--amber-bright); }
+  .v { color: var(--navy); font-size: 1.05rem; transition: color 0.2s; }
+  a.row:hover .v { color: var(--accent); }
 
   .cta {
     display: inline-block;
     margin-top: 2.6rem;
     padding: 0.85rem 1.5rem;
-    background: var(--amber);
-    color: var(--ink);
-    font-family: var(--mono);
+    background: var(--accent);
+    color: var(--cta-text);
+    font-family: var(--font);
     font-size: 0.75rem;
     font-weight: 500;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     text-decoration: none;
-    transition: background 0.2s;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-soft);
+    transition: background 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  .cta:hover { background: var(--amber-bright); }
+  .cta:hover { background: var(--accent-strong); }
 
   @media (max-width: 640px) {
     .row { grid-template-columns: 1fr; gap: 0.2rem; }

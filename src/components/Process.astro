@@ -8,7 +8,7 @@ const steps = [
   {
     n: '2',
     name: 'Produktion',
-    text: 'Vi filmar, fotograferar och bygger. Litet team, snabba beslut, korta vändor — ni ser arbetet medan det växer fram, inte först vid leveransen.',
+    text: 'Vi bygger kampanjerna och sätter dem i drift. Litet team, snabba beslut, korta vändor — ni ser arbetet medan det växer fram, inte först vid leveransen.',
   },
   {
     n: '3',
@@ -18,10 +18,10 @@ const steps = [
 ];
 ---
 
-<section class="process" id="process">
+<section class="process" id="process" data-field="drift">
   <div class="inner">
-    <p class="label section-label reveal">04 — Så arbetar vi</p>
-    <ol class="steps">
+    <p class="label section-label reveal">03 — Så arbetar vi</p>
+    <ol class="steps" data-stagger>
       {
         steps.map((s) => (
           <li class="reveal">
@@ -62,7 +62,7 @@ const steps = [
     margin: 0.7rem 0 0.9rem;
   }
   .text {
-    color: var(--bone-dim);
+    color: var(--type-dim);
     font-size: 0.97rem;
   }
 

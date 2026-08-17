@@ -4,7 +4,7 @@ const base = import.meta.env.BASE_URL.replace(/\/+$/, '');
 <header class="nav" id="site-nav">
   <div class="nav-inner">
     <a href={`${base}/`} class="wordmark">
-      <img src={`${base}/img/logo-white.webp`} alt="Scandic Marketing" width="129" height="40" />
+      <img src={`${base}/img/logo.webp`} alt="Scandic Marketing" width="129" height="40" />
     </a>
     <nav class="nav-center" aria-label="Huvudmeny">
       <a href={`${base}/`} class="nav-link">Hem</a>
@@ -47,9 +47,10 @@ const base = import.meta.env.BASE_URL.replace(/\/+$/, '');
     transition: background 0.3s;
   }
   .nav.scrolled {
-    background: rgba(19, 21, 23, 0.82);
+    background: rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
+    box-shadow: var(--shadow-soft);
   }
 
   .nav-inner {
@@ -72,13 +73,13 @@ const base = import.meta.env.BASE_URL.replace(/\/+$/, '');
   .nav-cta { justify-self: end; }
   .nav-link {
     position: relative;
-    font-family: var(--mono);
+    font-family: var(--font);
     font-size: 0.75rem;
-    font-weight: 500;
+    font-weight: 600;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     text-decoration: none;
-    color: var(--bone-dim);
+    color: var(--type-dim);
     transition: color 0.2s;
   }
   .nav-link::after {
@@ -88,28 +89,31 @@ const base = import.meta.env.BASE_URL.replace(/\/+$/, '');
     right: 0;
     bottom: -6px;
     height: 2px;
-    background: var(--amber);
+    border-radius: 1px;
+    background: var(--accent);
     transform: scaleX(0);
     transform-origin: left;
     transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
   }
-  .nav-link:hover { color: var(--bone); }
+  .nav-link:hover { color: var(--navy); }
   .nav-link:hover::after { transform: scaleX(1); }
 
   .nav-cta {
     padding: 0.6rem 1.1rem;
-    background: var(--amber);
+    background: var(--accent);
     color: var(--cta-text);
-    font-family: var(--mono);
+    font-family: var(--font);
     font-size: 0.72rem;
     font-weight: 500;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     text-decoration: none;
     white-space: nowrap;
-    transition: background 0.2s;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-soft);
+    transition: background 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  .nav-cta:hover { background: var(--amber-bright); }
+  .nav-cta:hover { background: var(--accent-strong); }
 
   .rule { border-top: 1px solid var(--hairline); }
   .ticks {

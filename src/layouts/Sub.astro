@@ -20,7 +20,7 @@ const { title, description, fig, figName, heading, sub } = Astro.props;
   <Nav />
   <main class="sub">
     <header class="sub-head">
-      <p class="label fig">Fig. {fig} — {figName}</p>
+      <p class="label fig">Marknadsföring — {figName}</p>
       <h1 class="display">{heading}</h1>
       {sub && <p class="sub-text">{sub}</p>}
     </header>
@@ -47,6 +47,6 @@ const { title, description, fig, figName, heading, sub } = Astro.props;
   .sub-text {
     margin-top: 1.3rem;
     max-width: var(--measure);
-    color: var(--bone-dim);
+    color: var(--type-dim);
   }
 </style>

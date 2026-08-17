@@ -1,8 +1,6 @@
 ---
 import '../styles/global.css';
-import frauncesUrl from '../fonts/fraunces-var.woff2?url';
-import instrumentUrl from '../fonts/instrument-sans-var.woff2?url';
-import plexUrl from '../fonts/plex-mono-500.woff2?url';
+import interUrl from '../fonts/inter-var-latin.woff2?url';
 
 interface Props {
   title: string;
@@ -33,15 +31,47 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta property="og:locale" content="sv_SE" />
     <meta name="twitter:card" content="summary_large_image" />
 
-    <link rel="preload" href={frauncesUrl} as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href={instrumentUrl} as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href={plexUrl} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={interUrl} as="font" type="font/woff2" crossorigin />
 
     <slot name="head" />
   </head>
   <body>
     <slot />
     <script>
+      const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // Word-level headline choreography: wrap words in .w, preserving nested
+      // elements (.hl, .dot). Skipped entirely under reduced motion.
+      if (!reduced) {
+        let wi = 0;
+        const wrapWords = (node: Node) => {
+          for (const child of Array.from(node.childNodes)) {
+            if (child.nodeType === Node.TEXT_NODE) {
+              const parts = (child.textContent || '').split(/(\s+)/);
+              const frag = document.createDocumentFragment();
+              for (const p of parts) {
+                if (!p) continue;
+                if (/^\s+$/.test(p)) frag.appendChild(document.createTextNode(p));
+                else {
+                  const s = document.createElement('span');
+                  s.className = 'w';
+                  s.style.setProperty('--wi', String(wi++));
+                  s.textContent = p;
+                  frag.appendChild(s);
+                }
+              }
+              child.replaceWith(frag);
+            } else if (child.nodeType === Node.ELEMENT_NODE) {
+              wrapWords(child);
+            }
+          }
+        };
+        document.querySelectorAll('.split').forEach((el) => {
+          wi = 0;
+          wrapWords(el);
+        });
+      }
+
       const io = new IntersectionObserver(
         (entries) => {
           for (const e of entries) {
@@ -53,7 +83,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
         },
         { rootMargin: '0px 0px -10% 0px' }
       );
-      document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+      document.querySelectorAll('.reveal, .split').forEach((el) => io.observe(el));
     </script>
   </body>
 </html>

@@ -5,7 +5,6 @@ import Hero from '../components/Hero.astro';
 import Clients from '../components/Clients.astro';
 import Results from '../components/Results.astro';
 import Services from '../components/Services.astro';
-import Cases from '../components/Cases.astro';
 import Break from '../components/Break.astro';
 import Process from '../components/Process.astro';
 import Faq from '../components/Faq.astro';
@@ -17,7 +16,7 @@ const jsonLd = {
   '@type': 'ProfessionalService',
   name: 'Scandic Marketing',
   description:
-    'Marknadsföringsbyrå i Helsingborg: film, foto, hemsidor och digital marknadsföring.',
+    'Marknadsföringsbyrå i Helsingborg: strategi, SEO, digital annonsering och sociala medier.',
   url: 'https://www.scandicmarketing.se',
   email: 'kontakt@scandicmarketing.se',
   telephone: '+46769298501',
@@ -35,17 +34,17 @@ const jsonLd = {
 ---
 
 <Base
-  title="Scandic Marketing — Film, foto och hemsidor i Helsingborg"
-  description="Scandic Marketing är en marknadsföringsbyrå i Helsingborg som gör film, foto, hemsidor och digital marknadsföring för företag i Skåne och Norden."
+  title="Scandic Marketing — Digital marknadsföring i Helsingborg"
+  description="Scandic Marketing är en marknadsföringsbyrå i Helsingborg som arbetar med strategi, SEO, digital annonsering och sociala medier för företag i Skåne och Norden."
 >
   <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  <canvas class="field-canvas" id="field" aria-hidden="true"></canvas>
   <Nav />
   <main>
     <Hero />
     <Clients />
     <Results />
     <Services />
-    <Cases />
     <Break />
     <Process />
     <Faq />
@@ -53,3 +52,8 @@ const jsonLd = {
   </main>
   <Footer />
 </Base>
+
+<script>
+  import { initField } from '../scripts/field';
+  initField(document.getElementById('field') as HTMLCanvasElement);
+</script>

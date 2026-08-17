@@ -13,6 +13,11 @@ export default defineConfig({
     '/booking': '/kontakt',
     '/artiklar': '/',
     '/tjanster': '/',
+    // Ägaren säljer bara marknadsföring numera. De gamla tjänstesidorna
+    // pekar om till erbjudandet i stället för att 404:a.
+    '/hemsida': '/#tjanster',
+    '/videoproduktion': '/#tjanster',
+    '/fotografi': '/#tjanster',
   },
   build: {
     inlineStylesheets: 'always',

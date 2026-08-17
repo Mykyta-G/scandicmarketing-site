@@ -1,142 +1,149 @@
----
-import { Image } from 'astro:assets';
-import dawn from '../assets/dawn.png';
----
-<section class="hero">
-  <div class="hero-media" aria-hidden="true">
-    <!-- Gryningstoppen — sajtens enda berg, i hjälterollen. Uppgraderingsväg:
-         byt till <video> när nytt hero-material filmas (golden hour, Helsingborg). -->
-    <Image
-      src={dawn}
-      alt=""
-      widths={[960, 1600, 2400]}
-      sizes="100vw"
-      formats={['webp']}
-      quality={76}
-      loading="eager"
-      fetchpriority="high"
-    />
-    <div class="grade"></div>
-  </div>
+<div class="hero-pin">
+  <section class="hero" data-field="logo">
+    <div class="hero-content" id="hero-content">
+      <p class="label kicker l0"><span class="tick" aria-hidden="true"></span>Marknadsföringsbyrå — Helsingborg</p>
 
-  <div class="hero-frame" aria-hidden="true">
-    <span class="corner br label">Fig. 01 — Översikt</span>
-    <span class="corner bl label">56.04°N&nbsp;&nbsp;12.69°E</span>
-  </div>
+      <!-- Rubriken finns kvar för sök och skärmläsare; partikelfältet är den synliga titeln. -->
+      <h1 class="sr-only">Scandic Marketing</h1>
 
-  <div class="hero-content">
-    <p class="label kicker l0"><span class="tick" aria-hidden="true"></span>Marknadsföringsbyrå — Helsingborg</p>
-    <h1 class="display l1">Scandic Marketing<span class="dot">.</span></h1>
-    <p class="sub l2">
-      Film, foto, hemsidor och marknadsföring som går att mäta —
-      i&nbsp;Helsingborg och resten av Norden.
-    </p>
-    <div class="actions l3">
-      <a class="cta" href="#kontakt">Boka ett samtal <span aria-hidden="true">→</span></a>
-      <a class="ghost label" href="#tjanster">Se våra tjänster <span class="bounce" aria-hidden="true">↓</span></a>
+      <!-- Fallback-ordmärke: syns utan JS (och tills fältet tagit över).
+           Partiklarna lägger sig exakt i den här rutan — den är måttstocken. -->
+      <div class="wm" id="wm" aria-hidden="true">
+        <span class="wm-line">Scandic</span><span class="wm-sp"> </span><span class="wm-line">Marketing<span class="dot">.</span></span>
+      </div>
+
+      <p class="sub l2">
+        Digital marknadsföring som går att mäta —
+        i&nbsp;Helsingborg och resten av Norden.
+      </p>
+      <div class="actions l3">
+        <a class="cta" href="#kontakt">Boka ett samtal <span aria-hidden="true">→</span></a>
+        <a class="ghost label" href="#tjanster">Se våra tjänster <span class="bounce" aria-hidden="true">↓</span></a>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
+</div>
+
+<script>
+  // Pinned hero: the content fades, lifts and scales away while the next
+  // section scrolls up over it. Plain rAF — works in every browser.
+  const content = document.getElementById('hero-content');
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (content && !reduced) {
+    let ticking = false;
+    const update = () => {
+      // innehållet är borta INNAN nästa sektion glider in över den klistrade
+      // hjälten — annars ligger två textlager över varandra på vit mark
+      const p = Math.min(Math.max(scrollY / (innerHeight * 0.85), 0), 1);
+      content.style.opacity = String(1 - p * 1.8);
+      content.style.translate = `0 ${p * -7}vh`;
+      content.style.scale = String(1 - p * 0.04);
+      content.style.visibility = p >= 0.6 ? 'hidden' : 'visible';
+      ticking = false;
+    };
+    addEventListener(
+      'scroll',
+      () => {
+        if (!ticking) {
+          ticking = true;
+          requestAnimationFrame(update);
+        }
+      },
+      { passive: true }
+    );
+    update();
+  }
+</script>
 
 <style>
+  .hero-pin { height: 150svh; }
   .hero {
-    position: relative;
+    position: sticky;
+    top: 0;
     min-height: 100svh;
     display: flex;
-    align-items: flex-end;
-    overflow: hidden;
-    isolation: isolate;
+    align-items: center;
+    z-index: 0;
   }
 
-  .hero-media {
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-  }
-  .hero-media :global(picture) {
-    position: absolute;
-    inset: 0;
-    display: block;
-  }
-  .hero-media :global(img) {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: 58% 30%;
-    filter: brightness(0.82) contrast(1.04) saturate(0.98);
-    animation: settle 16s cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
-  @keyframes settle {
-    from { scale: 1.07; }
-    to { scale: 1; }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-pin { height: auto; }
+    .hero { position: relative; }
   }
 
-  /* Blend the film into the page at the seams,
-     and give the type a quiet ground to stand on. */
-  .grade {
-    position: absolute;
-    inset: 0;
-    background:
-      linear-gradient(to bottom, rgba(19, 21, 23, 0.55), transparent 20%),
-      linear-gradient(to top, var(--ink) 0%, rgba(19, 21, 23, 0.6) 16%, transparent 48%),
-      linear-gradient(to right, rgba(19, 21, 23, 0.45), transparent 55%);
-  }
-
-  .hero-frame .corner {
-    position: absolute;
-    z-index: 2;
-    color: var(--bone-dim);
-  }
-  .corner.br { bottom: 1.6rem; right: var(--gutter); }
-  .corner.bl { bottom: 1.6rem; left: var(--gutter); }
-
+  /* En optisk kolumn, centrerad: kicker → ordmärke → undertext → CTA.
+     Partiklarna ritar titeln; allt annat är satt kring den. */
   .hero-content {
     position: relative;
     max-width: var(--page-max);
     width: 100%;
     margin-inline: auto;
-    padding: 0 var(--gutter) clamp(4rem, 10vh, 7rem);
+    padding: clamp(5rem, 12vh, 8rem) var(--gutter) clamp(2.5rem, 6vh, 4rem);
+    text-align: center;
+    will-change: opacity, translate, scale;
   }
 
   .kicker {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 0.7rem;
-    color: var(--bone-dim);
-    margin-bottom: 1.4rem;
+    color: var(--muted);
+    margin-bottom: clamp(1.6rem, 4vh, 2.6rem);
   }
   .tick {
     display: inline-block;
     width: 2rem;
     height: 2px;
-    background: var(--amber);
+    border-radius: 1px;
+    background: var(--accent);
+    animation: draw 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  @keyframes draw {
+    from { width: 0; }
+    to { width: 2rem; }
   }
 
-  h1 {
-    font-size: clamp(2.7rem, 6.6vw, 5.2rem);
+  /* Ordmärkesplatsen: samma slot i hierarkin som rubriken hade.
+     Utan JS är detta hjältens titel; med JS ritas den av partiklarna. */
+  .wm {
+    width: fit-content;
+    margin-inline: auto;
+    font-size: clamp(2.8rem, 7.4vw, 6.1rem);
+    font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    color: var(--navy);
   }
-  .dot { color: var(--amber); }
+  .wm .dot { color: var(--accent); }
+  @media (max-width: 759px) {
+    .wm-line { display: block; }
+    .wm-sp { display: none; }
+  }
 
   .sub {
-    margin-top: 1.3rem;
+    margin-top: clamp(1.5rem, 4vh, 2.4rem);
+    margin-inline: auto;
     max-width: var(--measure);
-    color: var(--bone-dim);
+    color: var(--type-dim);
     text-wrap: balance;
   }
 
   .actions {
-    margin-top: 2.1rem;
+    margin-top: 2.2rem;
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 2rem;
     flex-wrap: wrap;
   }
   .ghost {
-    color: var(--bone-dim);
+    color: var(--type-dim);
     text-decoration: none;
     transition: color 0.2s;
   }
-  .ghost:hover { color: var(--amber-bright); }
+  .ghost:hover { color: var(--accent-strong); }
   .bounce {
     display: inline-block;
     animation: bounce 1.8s ease-in-out infinite;
@@ -150,35 +157,33 @@ import dawn from '../assets/dawn.png';
   .cta {
     display: inline-block;
     padding: 0.85rem 1.5rem;
-    background: var(--amber);
+    background: var(--accent);
     color: var(--cta-text);
-    font-family: var(--mono);
     font-size: 0.75rem;
-    font-weight: 500;
+    font-weight: 600;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     text-decoration: none;
-    transition: background 0.2s;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-soft);
+    transition: background 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  .cta:hover { background: var(--amber-bright); }
+  .cta:hover { background: var(--accent-strong); box-shadow: var(--shadow-medium); }
 
-  .l0, .l1, .l2, .l3 {
+  .l0, .l2, .l3 {
     opacity: 0;
     translate: 0 24px;
     animation: rise 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   }
-  .l1 { animation-delay: 0.1s; }
   .l2 { animation-delay: 0.22s; }
   .l3 { animation-delay: 0.34s; }
   @keyframes rise {
     to { opacity: 1; translate: 0 0; }
   }
 
+  /* Efter .l0/.l2/.l3 i kaskaden: intro-koreografin är avstängd globalt
+     under reducerad rörelse — innehållet ska ändå synas. */
   @media (prefers-reduced-motion: reduce) {
-    .hero-media img { animation: none; }
-  }
-
-  @media (max-width: 640px) {
-    .corner.br { display: none; }
+    .l0, .l2, .l3 { opacity: 1; translate: none; }
   }
 </style>

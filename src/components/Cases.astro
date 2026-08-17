@@ -110,7 +110,7 @@ const cases = [
   }
   .plate {
     position: relative;
-    background: var(--ink-2);
+    background: var(--navy-2);
     overflow: hidden;
     transition: background 0.3s;
   }
@@ -124,7 +124,7 @@ const cases = [
     right: 0;
     bottom: 0;
     height: 3px;
-    background: var(--amber);
+    background: var(--blue);
     transform: scaleX(0);
     transform-origin: left;
     /* ingen övergång i viloläge → försvinner direkt vid hover-off */
@@ -161,7 +161,7 @@ const cases = [
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(to top, var(--ink-2), transparent 40%);
+    background: linear-gradient(to top, var(--navy-2), transparent 40%);
     pointer-events: none;
   }
   .plate:hover .media::after {
@@ -174,11 +174,11 @@ const cases = [
     font-size: clamp(1.25rem, 1.8vw, 1.6rem);
     margin-top: 1.1rem;
   }
-  .result { color: var(--bone-dim); }
+  .result { color: var(--ice-dim); }
 
   .text {
     margin-top: 0.7rem;
-    color: var(--bone-dim);
+    color: var(--ice-dim);
     font-size: 0.92rem;
     max-width: 34rem;
   }
@@ -194,7 +194,7 @@ const cases = [
   dd {
     margin: 0;
     font-size: clamp(1.25rem, 1.7vw, 1.55rem);
-    color: var(--bone);
+    color: var(--ice);
   }
   dd::after {
     content: '';
@@ -202,7 +202,7 @@ const cases = [
     width: 1.4rem;
     height: 2px;
     margin-top: 0.4rem;
-    background: var(--amber);
+    background: var(--blue);
   }
   dt {
     margin-top: 0.4rem;
@@ -213,7 +213,7 @@ const cases = [
   .tags {
     margin-top: 1.1rem;
     padding-bottom: 1.5rem;
-    color: var(--amber);
+    color: var(--blue);
   }
 
   .fine {

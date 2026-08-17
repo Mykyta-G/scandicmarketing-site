@@ -8,7 +8,7 @@ const base = import.meta.env.BASE_URL.replace(/\/+$/, '');
     <div class="col brand">
       <img src={`${base}/img/logo-white.webp`} alt="Scandic Marketing" width="129" height="40" />
       <p class="tagline">
-        Film, foto, hemsidor och marknadsföring som går att mäta —
+        Digital marknadsföring som går att mäta —
         i Helsingborg och resten av Norden.
       </p>
       <ul class="contact-list">
@@ -24,18 +24,17 @@ const base = import.meta.env.BASE_URL.replace(/\/+$/, '');
         <li><a href={`${base}/`}>Hem</a></li>
         <li><a href={`${base}/#tjanster`}>Tjänster</a></li>
         <li><a href={`${base}/#resultat`}>Resultat</a></li>
-        <li><a href={`${base}/#arbete`}>Framgångshistorier</a></li>
         <li><a href={`${base}/#kontakt`}>Kontakt</a></li>
       </ul>
     </nav>
 
-    <nav class="col" aria-label="Våra tjänster">
-      <p class="label head">Våra tjänster</p>
+    <nav class="col" aria-label="Marknadsföringen i praktiken">
+      <p class="label head">I arbetet ingår</p>
       <ul>
-        <li><a href={`${base}/videoproduktion`}>Videoproduktion & drönare</a></li>
-        <li><a href={`${base}/fotografi`}>Fotografering & branding</a></li>
-        <li><a href={`${base}/hemsida`}>Hemsidor & SEO</a></li>
-        <li><a href={`${base}/#kontakt`}>Digital marknadsföring</a></li>
+        <li><a href={`${base}/#tjanster`}>Strategi och målgrupp</a></li>
+        <li><a href={`${base}/#tjanster`}>Sökmotoroptimering</a></li>
+        <li><a href={`${base}/#tjanster`}>Digital annonsering</a></li>
+        <li><a href={`${base}/#tjanster`}>Sociala medier och innehåll</a></li>
       </ul>
     </nav>
 
@@ -63,10 +62,22 @@ const base = import.meta.env.BASE_URL.replace(/\/+$/, '');
 </footer>
 
 <style>
-  .rule { border-top: 1px solid var(--hairline); }
+  /* Sidans enda mörka band — kundens egen hjältegradient bär avslutet.
+     Lokala färger: allt härinne ligger på navy, inte på den vita marken. */
+  .footer {
+    --f-dim: #a9b6c9;   /* sekundär typ på navy — ~8:1 */
+    --f-label: #9fb0c6; /* etiketter på navy — AA även på gradientens ljusa ände */
+    --f-hair: rgba(238, 242, 247, 0.16);
+    background: var(--gradient-hero);
+    color: #eef2f7;
+    margin-top: clamp(4rem, 9vh, 6rem);
+  }
+  .footer :global(.label) { color: var(--f-label); }
+
+  .rule { border-top: 1px solid var(--f-hair); }
   .ticks {
     height: 7px;
-    background: repeating-linear-gradient(to right, var(--hairline) 0 1px, transparent 1px 72px);
+    background: repeating-linear-gradient(to right, var(--f-hair) 0 1px, transparent 1px 72px);
     mask-image: linear-gradient(to right, transparent, black 8%, black 92%, transparent);
   }
 
@@ -82,7 +93,7 @@ const base = import.meta.env.BASE_URL.replace(/\/+$/, '');
   .brand img { height: 2.1rem; width: auto; }
   .tagline {
     margin-top: 1.2rem;
-    color: var(--bone-dim);
+    color: var(--f-dim);
     font-size: 0.92rem;
     max-width: 22rem;
   }
@@ -92,16 +103,16 @@ const base = import.meta.env.BASE_URL.replace(/\/+$/, '');
     padding: 0;
   }
   .contact-list li {
-    color: var(--bone-dim);
+    color: var(--f-dim);
     font-size: 0.92rem;
     padding: 0.25rem 0;
   }
   .contact-list a {
-    color: var(--bone-dim);
+    color: var(--f-dim);
     text-decoration: none;
     transition: color 0.2s;
   }
-  .contact-list a:hover { color: var(--amber-bright); }
+  .contact-list a:hover { color: #93c5fd; }
 
   .head { margin-bottom: 1rem; }
   .col ul {
@@ -111,32 +122,33 @@ const base = import.meta.env.BASE_URL.replace(/\/+$/, '');
   }
   .col ul li { padding: 0.28rem 0; }
   .col ul a {
-    color: var(--bone-dim);
+    color: var(--f-dim);
     font-size: 0.92rem;
     text-decoration: none;
     transition: color 0.2s;
   }
-  .col ul a:hover { color: var(--amber-bright); }
+  .col ul a:hover { color: #93c5fd; }
 
   .hours-head { margin-top: 1.6rem; }
-  .hours { color: var(--bone-dim); font-size: 0.92rem; }
+  .hours { color: var(--f-dim); font-size: 0.92rem; }
   .mini-cta {
     display: inline-block;
     margin-top: 1.5rem;
     padding: 0.7rem 1.2rem;
-    background: var(--amber);
+    background: var(--accent);
     color: var(--cta-text);
-    font-family: var(--mono);
+    font-family: var(--font);
     font-size: 0.7rem;
     font-weight: 500;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     text-decoration: none;
-    transition: background 0.2s;
+    border-radius: var(--radius);
+    transition: background 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
-  .mini-cta:hover { background: var(--amber-bright); }
+  .mini-cta:hover { background: var(--accent-strong); }
 
-  .bottom { border-top: 1px solid var(--hairline); }
+  .bottom { border-top: 1px solid var(--f-hair); }
   .bottom-inner {
     max-width: var(--page-max);
     margin-inline: auto;
@@ -147,16 +159,16 @@ const base = import.meta.env.BASE_URL.replace(/\/+$/, '');
     gap: 1.5rem;
     flex-wrap: wrap;
   }
-  .muted { color: var(--grey); font-size: 0.82rem; }
+  .muted { color: var(--f-dim); font-size: 0.82rem; }
   .legal { display: flex; gap: 1.6rem; }
   .legal a {
-    color: var(--grey);
+    color: var(--f-dim);
     font-size: 0.82rem;
     text-decoration: none;
     transition: color 0.2s;
   }
-  .legal a:hover { color: var(--bone); }
-  .sig { color: var(--grey); }
+  .legal a:hover { color: #eef2f7; }
+  .sig { color: var(--f-label); }
 
   @media (max-width: 900px) {
     .inner { grid-template-columns: 1fr 1fr; gap: 2.4rem; }

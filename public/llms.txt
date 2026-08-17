@@ -1,17 +1,21 @@
 # Scandic Marketing
 
-> Marknadsföringsbyrå i Helsingborg, Sverige. Film, foto, hemsidor och digital
-> marknadsföring för företag i Skåne och övriga Norden.
+> Marknadsföringsbyrå i Helsingborg, Sverige. Digital marknadsföring för
+> företag i Skåne och övriga Norden.
 
 ## Tjänster
 
-- Film: reklamfilm, företagsfilm och innehåll för sociala medier. 4K och drönare.
-  Fast offert, de flesta produktioner från ca 5 000 kr.
-- Foto: företagsporträtt, produktbilder, mat, miljö och event. Fast offert.
-- Hemsidor: skräddarsydda, sökmotorvänliga hemsidor till fast månadspris
-  (Hemsida Pro 499 kr/mån, Hemsida Premium 1 499 kr/mån — lanseringspris,
-  12 mån avtal, ex. moms). Domän, support och underhåll ingår.
-- Digital marknadsföring: sökmotoroptimering, annonsering och sociala medier.
+Scandic Marketing arbetar med en enda tjänst: digital marknadsföring.
+
+- Strategi och målgrupp: grundlig analys av nuvarande situation och målgrupp,
+  och en komplett marknadsföringsstrategi byggd för långsiktig tillväxt.
+- Sökmotoroptimering: SEO — teknik, innehåll och struktur.
+- Digital annonsering: Google Ads och annonsering i sociala medier, med
+  budgeten följd och optimerad löpande.
+- Sociala medier och innehåll: innehåll planerat och publicerat kontinuerligt.
+- Uppföljning: regelbundna rapporter med resultat och insikter.
+
+Pris efter offert, alltid fast pris innan start.
 
 ## Kontakt
 
@@ -23,8 +27,5 @@
 
 ## Sidor
 
-- [Startsida](https://www.scandicmarketing.se/): tjänster, arbetssätt, vanliga frågor
-- [Hemsidor](https://www.scandicmarketing.se/hemsida): paket och månadspriser
-- [Videoproduktion](https://www.scandicmarketing.se/videoproduktion): filmtjänster och offert
-- [Fotografi](https://www.scandicmarketing.se/fotografi): fototjänster och offert
+- [Startsida](https://www.scandicmarketing.se/): tjänsten, arbetssätt, vanliga frågor
 - [Kontakt](https://www.scandicmarketing.se/kontakt): kontaktuppgifter
