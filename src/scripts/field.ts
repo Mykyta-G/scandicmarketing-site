@@ -14,7 +14,7 @@
                samplat till partikelmål; punkten efter ordet är alltid blå
     drift    — fritt flöde, låg intensitet bakom läsytor
     bars     — stigande staplar (Resultat: mätbarhet)
-    shapes   — play-triangel → bländare → webbläsarram genom Tjänster
+    shapes   — måltavla med roterande sikte genom Tjänster
     wave     — kustlinje/horisont (Break — Helsingborg vid Sundet)
     converge — konvergenspunkt (Kontakt)
 
@@ -264,43 +264,33 @@ export function initField(canvas: HTMLCanvasElement | null) {
       octx.fillStyle = octx.strokeStyle = '#fff';
       const cx = off.width / 2, cy = off.height / 2;
       octx.lineWidth = 7;
-      if (progress < 0.34) {
-        // play-triangel (film)
+
+      /* Måltavla — samma symbol som ägarens eget marknadsföringskort.
+         Tidigare låg här play-triangel, bländare och webbläsarram, alltså
+         film, foto och hemsidor: tjänster han inte säljer. Nu en enda form,
+         eftersom det bara finns ett erbjudande att illustrera. Siktet vrids
+         långsamt med skrollen så formen fortfarande lever. */
+      const spin = progress * 0.9;
+
+      for (const r of [86, 56, 26]) {
         octx.beginPath();
-        octx.moveTo(cx - 55, cy - 70);
-        octx.lineTo(cx + 75, cy);
-        octx.lineTo(cx - 55, cy + 70);
-        octx.closePath();
+        octx.arc(cx, cy, r, 0, TAU);
         octx.stroke();
-      } else if (progress < 0.67) {
-        // bländare (foto): ring + sex blad
+      }
+
+      // mitten
+      octx.beginPath();
+      octx.arc(cx, cy, 7, 0, TAU);
+      octx.fill();
+
+      // sikte: fyra streck som roterar med skrollen
+      octx.lineWidth = 6;
+      for (let t = 0; t < 4; t++) {
+        const a = spin + (t / 4) * TAU;
+        const ca = Math.cos(a), sa = Math.sin(a);
         octx.beginPath();
-        octx.arc(cx, cy, 82, 0, TAU);
-        octx.stroke();
-        for (let b = 0; b < 6; b++) {
-          const a0 = (b / 6) * TAU;
-          const a1 = a0 + TAU / 4.1;
-          octx.beginPath();
-          octx.moveTo(cx + Math.cos(a0) * 78, cy + Math.sin(a0) * 78);
-          octx.lineTo(cx + Math.cos(a1) * 14, cy + Math.sin(a1) * 14);
-          octx.stroke();
-        }
-      } else {
-        // webbläsarram (hemsidor)
-        octx.lineWidth = 6;
-        octx.strokeRect(cx - 110, cy - 72, 220, 144);
-        octx.beginPath();
-        octx.moveTo(cx - 110, cy - 44);
-        octx.lineTo(cx + 110, cy - 44);
-        octx.stroke();
-        for (let d = 0; d < 3; d++) {
-          octx.beginPath();
-          octx.arc(cx - 94 + d * 17, cy - 58, 4.5, 0, TAU);
-          octx.fill();
-        }
-        octx.beginPath();
-        octx.moveTo(cx - 88, cy + 2); octx.lineTo(cx + 20, cy + 2);
-        octx.moveTo(cx - 88, cy + 30); octx.lineTo(cx + 60, cy + 30);
+        octx.moveTo(cx + ca * 96, cy + sa * 96);
+        octx.lineTo(cx + ca * 116, cy + sa * 116);
         octx.stroke();
       }
       return sampleOffscreen(2000, fitRect(16 / 9, 0.5, 0.55, 0.72, 0.5));
