@@ -1,36 +1,10 @@
 ---
-/* En enda tjänst: marknadsföring. Ägaren säljer inte film, foto eller
-   hemsidor separat — hans egen sajt listar ett kort, "Marknadsföring".
-   Punkterna nedan är hämtade ur hans befintliga marknadsföringstext.
-   Inga bilder här: korten låg tidigare på stockfoton, vilket var just det
-   han anmärkte på. */
-const includes = [
-  {
-    n: '01',
-    name: 'Strategi och målgrupp',
-    text: 'Grundlig analys av er nuvarande situation och målgrupp, och en komplett marknadsföringsstrategi byggd för långsiktig tillväxt.',
-  },
-  {
-    n: '02',
-    name: 'Sökmotoroptimering',
-    text: 'SEO som gör att kunderna hittar er på Google — teknik, innehåll och struktur.',
-  },
-  {
-    n: '03',
-    name: 'Digital annonsering',
-    text: 'Google Ads och annonsering i sociala medier, med budgeten följd och optimerad löpande.',
-  },
-  {
-    n: '04',
-    name: 'Sociala medier och innehåll',
-    text: 'Innehåll som engagerar er målgrupp, planerat och publicerat kontinuerligt.',
-  },
-  {
-    n: '05',
-    name: 'Uppföljning',
-    text: 'Regelbundna rapporter med tydliga resultat och insikter — och optimering utifrån dem.',
-  },
-];
+/* En enda tjänst: marknadsföring — ingenting annat.
+   Ägaren säljer inte film, foto eller hemsidor, och inte heller SEO,
+   annonsering eller sociala medier som separata poster; hans gamla sajt
+   listar sådant felaktigt. Därför står här bara erbjudandet.
+   ATT FYLLA PÅ: vad marknadsföringen konkret innebär måste komma från
+   ägaren själv — hitta inte på det. */
 ---
 
 <section class="services" id="tjanster" data-field="shapes">
@@ -40,22 +14,11 @@ const includes = [
     <div class="offer">
       <h2 class="display dash reveal">Digital marknadsföring<span class="dot">.</span></h2>
       <p class="lead reveal">
-        SEO, annonsering och sociala medier — med resultat som mäts mot verkliga siffror.
+        Det är vad vi gör — och det enda vi gör. Marknadsföring med resultat
+        som mäts mot verkliga siffror.
       </p>
+      <a class="cta reveal" href="#kontakt">Boka ett samtal <span aria-hidden="true">→</span></a>
     </div>
-
-    <p class="label includes-label reveal">I arbetet ingår</p>
-    <ol class="grid" data-stagger>
-      {
-        includes.map((s) => (
-          <li class="card reveal reveal-clip">
-            <span class="label n" aria-hidden="true">{s.n}</span>
-            <h3 class="display">{s.name}</h3>
-            <p class="text">{s.text}</p>
-          </li>
-        ))
-      }
-    </ol>
   </div>
 </section>
 
@@ -82,47 +45,24 @@ const includes = [
     font-size: 1.1rem;
   }
 
-  .includes-label {
-    margin: clamp(2.5rem, 6vh, 4rem) 0 1.4rem;
-  }
-
-  .grid {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1.1rem;
-  }
-  @media (max-width: 1000px) { .grid { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
-
-  .card {
-    background: var(--surface);
-    border-radius: var(--radius-lg);
+  .cta {
+    display: inline-block;
+    margin-top: 2.2rem;
+    padding: 0.85rem 1.5rem;
+    background: var(--accent);
+    color: #fff;
+    border-radius: var(--radius);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    text-decoration: none;
     box-shadow: var(--shadow-soft);
-    padding: 1.5rem 1.4rem 1.6rem;
-    transition: box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), translate 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: background 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s, translate 0.3s;
   }
-  .card:hover { box-shadow: var(--shadow-medium); translate: 0 -3px; }
-
-  .n {
-    display: block;
-    color: var(--accent);
-    margin-bottom: 1.4rem;
-  }
-
-  h3 {
-    font-size: 1.22rem;
-    font-weight: 700;
-    letter-spacing: -0.015em;
-    line-height: 1.25;
-    text-wrap: balance;
-  }
-  .text {
-    margin-top: 0.6rem;
-    color: var(--type-dim);
-    font-size: 0.92rem;
-    line-height: 1.55;
+  .cta:hover {
+    background: var(--accent-deep, #1d4ed8);
+    box-shadow: var(--shadow-medium);
+    translate: 0 -2px;
   }
 </style>
