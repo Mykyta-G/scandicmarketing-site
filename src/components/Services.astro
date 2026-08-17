@@ -3,52 +3,69 @@
    Ägaren säljer inte film, foto eller hemsidor, och inte heller SEO,
    annonsering eller sociala medier som separata poster; hans gamla sajt
    listar sådant felaktigt. Därför står här bara erbjudandet.
+
+   Den här sektionen var tidigare två: en tunn tjänstesektion och en
+   separat brytsektion som sa exakt samma sak med samma knapp. De är
+   sammanslagna — ett påstående, en knapp, vågformationen bakom.
+
    ATT FYLLA PÅ: vad marknadsföringen konkret innebär måste komma från
    ägaren själv — hitta inte på det. */
 ---
 
-<section class="services" id="tjanster" data-field="shapes">
+<section class="services" id="tjanster" data-field="wave">
   <div class="inner">
     <p class="label section-label reveal">02 — Tjänster</p>
 
-    <div class="offer">
-      <h2 class="display dash reveal">Digital marknadsföring<span class="dot">.</span></h2>
-      <p class="lead reveal">
-        Det är vad vi gör — och det enda vi gör. Marknadsföring med resultat
-        som mäts mot verkliga siffror.
-      </p>
-      <a class="cta reveal" href="#kontakt">Boka ett samtal <span aria-hidden="true">→</span></a>
-    </div>
+    <h2 class="display reveal">Digital marknadsföring<span class="dot">.</span></h2>
+
+    <p class="line display split">
+      Bra marknadsföring <span class="hl">märks</span><span class="dot">.</span><br />
+      Vår <span class="hl">mäts</span><span class="dot">.</span>
+    </p>
+
+    <a class="cta reveal" href="#kontakt">Boka ett samtal <span aria-hidden="true">→</span></a>
   </div>
 </section>
 
 <style>
   .services {
-    padding: clamp(5rem, 12vh, 9rem) 0 clamp(3rem, 7vh, 5rem);
+    position: relative;
+    min-height: 86svh;
+    display: grid;
+    place-items: center;
+    padding: clamp(4rem, 10vh, 7rem) 0;
+    border-bottom: 1px solid var(--hairline);
   }
   .inner {
+    position: relative;
     max-width: var(--page-max);
     margin-inline: auto;
     padding-inline: var(--gutter);
+    text-align: center;
   }
-  .section-label { margin-bottom: 2.5rem; }
 
-  .offer h2 {
-    font-size: clamp(2.2rem, 4.6vw, 3.8rem);
-    max-width: 16ch;
+  .section-label { margin-bottom: 2.2rem; }
+
+  h2 {
+    font-size: clamp(2.4rem, 5.6vw, 4.6rem);
+    /* lyfter texten ur partikelvågen */
+    text-shadow: 0 1px 20px rgba(255, 255, 255, 0.75);
   }
   .dot { color: var(--accent); }
-  .lead {
-    margin-top: 1.4rem;
-    max-width: var(--measure);
+
+  .line {
+    margin-top: 1.8rem;
     color: var(--type-dim);
-    font-size: 1.1rem;
+    font-size: clamp(1.2rem, 2.2vw, 1.75rem);
+    font-weight: 500;
+    text-shadow: 0 1px 20px rgba(255, 255, 255, 0.75);
   }
+  .line .dot { color: var(--accent); }
 
   .cta {
     display: inline-block;
-    margin-top: 2.2rem;
-    padding: 0.85rem 1.5rem;
+    margin-top: 2.6rem;
+    padding: 0.9rem 1.6rem;
     background: var(--accent);
     color: #fff;
     border-radius: var(--radius);
@@ -61,7 +78,7 @@
     transition: background 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s, translate 0.3s;
   }
   .cta:hover {
-    background: var(--accent-deep, #1d4ed8);
+    background: var(--accent-strong);
     box-shadow: var(--shadow-medium);
     translate: 0 -2px;
   }
