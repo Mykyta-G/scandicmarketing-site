@@ -5,6 +5,7 @@ import Hero from '../components/Hero.astro';
 import Clients from '../components/Clients.astro';
 import Results from '../components/Results.astro';
 import Services from '../components/Services.astro';
+import Break from '../components/Break.astro';
 import Process from '../components/Process.astro';
 import Faq from '../components/Faq.astro';
 import Contact from '../components/Contact.astro';
@@ -15,7 +16,7 @@ const jsonLd = {
   '@type': 'ProfessionalService',
   name: 'Scandic Marketing',
   description:
-    'Marknadsföringsbyrå i Helsingborg. Digital marknadsföring för företag i Skåne och Norden.',
+    'Marknadsföringsbyrå i Helsingborg: strategi, SEO, digital annonsering och sociala medier.',
   url: 'https://www.scandicmarketing.se',
   email: 'kontakt@scandicmarketing.se',
   telephone: '+46769298501',
@@ -34,7 +35,7 @@ const jsonLd = {
 
 <Base
   title="Scandic Marketing — Digital marknadsföring i Helsingborg"
-  description="Scandic Marketing är en marknadsföringsbyrå i Helsingborg som arbetar med digital marknadsföring för företag i Skåne och Norden."
+  description="Scandic Marketing är en marknadsföringsbyrå i Helsingborg som arbetar med strategi, SEO, digital annonsering och sociala medier för företag i Skåne och Norden."
 >
   <script slot="head" type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   <canvas class="field-canvas" id="field" aria-hidden="true"></canvas>
@@ -44,6 +45,7 @@ const jsonLd = {
     <Clients />
     <Results />
     <Services />
+    <Break />
     <Process />
     <Faq />
     <Contact />
