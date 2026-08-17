@@ -14,7 +14,7 @@
                samplat till partikelmål; punkten efter ordet är alltid blå
     drift    — fritt flöde, låg intensitet bakom läsytor
     bars     — stigande staplar (Resultat: mätbarhet)
-    shapes   — måltavla med roterande sikte genom Tjänster
+    shapes   — play-triangel → hårkors genom Tjänster
     wave     — kustlinje/horisont (Break — Helsingborg vid Sundet)
     converge — konvergenspunkt (Kontakt)
 
@@ -265,33 +265,34 @@ export function initField(canvas: HTMLCanvasElement | null) {
       const cx = off.width / 2, cy = off.height / 2;
       octx.lineWidth = 7;
 
-      /* Måltavla — samma symbol som ägarens eget marknadsföringskort.
-         Tidigare låg här play-triangel, bländare och webbläsarram, alltså
-         film, foto och hemsidor: tjänster han inte säljer. Nu en enda form,
-         eftersom det bara finns ett erbjudande att illustrera. Siktet vrids
-         långsamt med skrollen så formen fortfarande lever. */
-      const spin = progress * 0.9;
-
-      for (const r of [86, 56, 26]) {
+      /* Två former: play-triangel → hårkors. Bländaren och webbläsarramen
+         är borta (foto och hemsidor — tjänster han inte säljer). */
+      if (progress < 0.5) {
+        // play-triangel
         octx.beginPath();
-        octx.arc(cx, cy, r, 0, TAU);
+        octx.moveTo(cx - 55, cy - 70);
+        octx.lineTo(cx + 75, cy);
+        octx.lineTo(cx - 55, cy + 70);
+        octx.closePath();
         octx.stroke();
-      }
-
-      // mitten
-      octx.beginPath();
-      octx.arc(cx, cy, 7, 0, TAU);
-      octx.fill();
-
-      // sikte: fyra streck som roterar med skrollen
-      octx.lineWidth = 6;
-      for (let t = 0; t < 4; t++) {
-        const a = spin + (t / 4) * TAU;
-        const ca = Math.cos(a), sa = Math.sin(a);
+      } else {
+        // hårkors: ring, kors genom mitten, prick i centrum
         octx.beginPath();
-        octx.moveTo(cx + ca * 96, cy + sa * 96);
-        octx.lineTo(cx + ca * 116, cy + sa * 116);
+        octx.arc(cx, cy, 76, 0, TAU);
         octx.stroke();
+
+        octx.lineWidth = 6;
+        const gap = 22, arm = 108;
+        octx.beginPath();
+        octx.moveTo(cx - arm, cy); octx.lineTo(cx - gap, cy);
+        octx.moveTo(cx + gap, cy); octx.lineTo(cx + arm, cy);
+        octx.moveTo(cx, cy - arm); octx.lineTo(cx, cy - gap);
+        octx.moveTo(cx, cy + gap); octx.lineTo(cx, cy + arm);
+        octx.stroke();
+
+        octx.beginPath();
+        octx.arc(cx, cy, 8, 0, TAU);
+        octx.fill();
       }
       return sampleOffscreen(2000, fitRect(16 / 9, 0.5, 0.55, 0.72, 0.5));
     }
@@ -566,11 +567,11 @@ void main() {
     last = now;
     const t = now / 1000;
 
-    // Tjänster: tre former efter hur långt man scrollat genom sektionen
+    // Tjänster: två former efter hur långt man scrollat genom sektionen
     if (formation === 'shapes' && shapesEl) {
       const r = shapesEl.getBoundingClientRect();
       const prog = Math.min(Math.max((H * 0.5 - r.top) / Math.max(r.height, 1), 0), 0.999);
-      const phase = prog < 0.34 ? 0 : prog < 0.67 ? 1 : 2;
+      const phase = prog < 0.5 ? 0 : 1;
       if (phase !== shapesPhase) {
         shapesPhase = phase;
         setFormation('shapes', prog);
