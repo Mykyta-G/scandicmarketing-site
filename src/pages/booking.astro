@@ -1,0 +1,334 @@
+---
+/* Bokningssidan.
+
+   Samma fält som ägarens nuvarande formulär, med två skillnader: tjänstevalet
+   är borta (han säljer bara marknadsföring, så frågan hade bara ett svar) och
+   sidan är byggd i sajtens eget formspråk i stället för mallens.
+
+   OBS — INGEN SERVER: sajten är statisk. Formuläret öppnar därför besökarens
+   e-postklient med allt ifyllt i brödtexten. Det är ärligt och fungerar
+   överallt, men det är inte en riktig inlämning: ingen kvittens, inget
+   register, och den som saknar e-postklient blir strandsatt (därför står
+   adress och telefon synligt bredvid).
+
+   Vill han ha riktig inlämning behövs en endpoint — Formspree, Netlify Forms
+   eller en liten funktion. Byt då ut submit-hanteraren mot ett fetch-anrop;
+   fälten heter redan samma sak som hans nuvarande formulär. */
+import Base from '../layouts/Base.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+
+const base = import.meta.env.BASE_URL.replace(/\/+$/, '');
+
+const steps = [
+  {
+    n: '1',
+    t: 'Vi läser er förfrågan',
+    d: 'Vi går igenom det ni skrivit och förbereder mötet efter era behov — ingen standardpresentation.',
+  },
+  {
+    n: '2',
+    t: 'Besked inom en arbetsdag',
+    d: 'Ni får svar med tid och plats. Passar inte tiden ni valde föreslår vi en annan.',
+  },
+  {
+    n: '3',
+    t: 'Samtalet är kostnadsfritt',
+    d: 'Vi går igenom vad ni vill uppnå och om vi är rätt byrå för det. Ingen förpliktelse.',
+  },
+];
+
+const times = ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00'];
+---
+
+<Base
+  title="Boka ett samtal — Scandic Marketing"
+  description="Boka ett kostnadsfritt samtal med Scandic Marketing. Berätta vad ni vill uppnå, så hör vi av oss inom en arbetsdag."
+>
+  <canvas class="field-canvas" id="field" aria-hidden="true"></canvas>
+  <Nav />
+
+  <main>
+    <section class="head" data-field="braid">
+      <div class="inner">
+        <p class="label section-label reveal">Boka</p>
+        <h1 class="display dash split">Berätta vad ni vill uppnå.</h1>
+        <p class="lead reveal">
+          Fyll i formuläret så återkommer vi inom en arbetsdag. Samtalet är
+          kostnadsfritt och du binder dig inte till något.
+        </p>
+      </div>
+    </section>
+
+    <section class="form-wrap">
+      <div class="inner cols">
+        <form class="form reveal" id="booking-form" novalidate>
+          <div class="row two">
+            <p class="field">
+              <label class="label" for="name">Namn <span class="req">*</span></label>
+              <input id="name" name="name" type="text" required autocomplete="name"
+                placeholder="Ditt fullständiga namn" />
+            </p>
+            <p class="field">
+              <label class="label" for="email">E-post <span class="req">*</span></label>
+              <input id="email" name="email" type="email" required autocomplete="email"
+                placeholder="din@epost.se" />
+            </p>
+          </div>
+
+          <div class="row two">
+            <p class="field">
+              <label class="label" for="phone">Telefon</label>
+              <input id="phone" name="phone" type="tel" autocomplete="tel"
+                placeholder="070-123 45 67" />
+            </p>
+            <p class="field">
+              <label class="label" for="company">Företag</label>
+              <input id="company" name="company" type="text" autocomplete="organization"
+                placeholder="Ert företag" />
+            </p>
+          </div>
+
+          <div class="row two">
+            <p class="field">
+              <label class="label" for="date">Önskat datum</label>
+              <input id="date" name="preferredDate" type="date" />
+            </p>
+            <p class="field">
+              <label class="label" for="time">Önskad tid</label>
+              <select id="time" name="preferredTime">
+                <option value="">Välj en tid</option>
+                {times.map((t) => <option value={t}>{t}</option>)}
+              </select>
+            </p>
+          </div>
+
+          <p class="field">
+            <label class="label" for="message">Berätta om ert projekt <span class="req">*</span></label>
+            <textarea id="message" name="message" rows="6" required
+              placeholder="Vad säljer ni, vem ska hitta er, och vad räknas som resultat för er?"></textarea>
+          </p>
+
+          <p class="note" id="form-note" role="status" aria-live="polite">
+            Knappen öppnar din e-post med uppgifterna ifyllda — skicka mejlet så
+            har vi det.
+          </p>
+
+          <button class="cta" type="submit">Skicka bokningsförfrågan <span aria-hidden="true">→</span></button>
+
+          <p class="fine">
+            Vi använder uppgifterna bara för att svara på din förfrågan. Läs mer i
+            <a href={`${base}/integritetspolicy`}>integritetspolicyn</a>.
+          </p>
+        </form>
+
+        <aside class="aside">
+          <div class="card reveal">
+            <p class="label">Hellre direkt?</p>
+            <a class="direct" href="mailto:kontakt@scandicmarketing.se">kontakt@scandicmarketing.se</a>
+            <a class="direct" href="tel:+46769298501">+46 76 929 85 01</a>
+            <p class="hours label">Vardagar 09–17 · svar inom en arbetsdag</p>
+          </div>
+
+          <ol class="steps" data-stagger>
+            {
+              steps.map((s) => (
+                <li class="reveal">
+                  <span class="label n">{s.n}</span>
+                  <h2 class="display">{s.t}</h2>
+                  <p class="text">{s.d}</p>
+                </li>
+              ))
+            }
+          </ol>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</Base>
+
+<script>
+  import { initField } from '../scripts/field';
+  initField(document.getElementById('field') as HTMLCanvasElement);
+</script>
+
+<script>
+  /* Statisk sajt: ingen endpoint tar emot posten. Vi bygger i stället ett
+     färdigt mejl och lämnar över till besökarens e-postklient. Validering
+     körs först, så man inte skickas iväg med ett halvfyllt formulär. */
+  const form = document.getElementById('booking-form') as HTMLFormElement | null;
+  const note = document.getElementById('form-note');
+  form?.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (!form.reportValidity()) return;
+
+    const v = (n: string) =>
+      (form.elements.namedItem(n) as HTMLInputElement | null)?.value.trim() || '';
+
+    const lines = [
+      `Namn: ${v('name')}`,
+      `E-post: ${v('email')}`,
+      v('phone') && `Telefon: ${v('phone')}`,
+      v('company') && `Företag: ${v('company')}`,
+      v('preferredDate') && `Önskat datum: ${v('preferredDate')}`,
+      v('preferredTime') && `Önskad tid: ${v('preferredTime')}`,
+      '',
+      'Om projektet:',
+      v('message'),
+    ].filter(Boolean);
+
+    const href =
+      'mailto:kontakt@scandicmarketing.se' +
+      `?subject=${encodeURIComponent('Bokningsförfrågan — ' + (v('company') || v('name')))}` +
+      `&body=${encodeURIComponent(lines.join('\n'))}`;
+
+    if (note) note.textContent = 'Öppnar din e-post — tryck skicka i mejlet så har vi förfrågan.';
+    location.href = href;
+  });
+</script>
+
+<style>
+  .head { padding: clamp(4rem, 11vh, 7rem) 0 clamp(1.5rem, 4vh, 2.5rem); }
+  .inner {
+    max-width: var(--page-max);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+  .section-label { margin-bottom: 2.2rem; }
+  h1 {
+    font-size: clamp(2.2rem, 5vw, 4rem);
+    max-width: 16ch;
+  }
+  .lead {
+    margin-top: 1.6rem;
+    max-width: var(--measure);
+    color: var(--type-dim);
+    font-size: 1.08rem;
+  }
+
+  .form-wrap { padding-bottom: clamp(4rem, 10vh, 7rem); }
+  .cols {
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.85fr);
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: start;
+    margin-top: clamp(2rem, 5vh, 3.5rem);
+  }
+
+  /* ————— Formuläret ————— */
+  .form {
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-soft);
+    padding: clamp(1.5rem, 3.5vw, 2.6rem);
+  }
+  .row.two {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.1rem;
+  }
+  .field { margin: 0 0 1.1rem; display: flex; flex-direction: column; gap: 0.5rem; }
+  .req { color: var(--accent); }
+
+  input, select, textarea {
+    font: inherit;
+    font-size: 1rem;
+    color: var(--navy);
+    background: var(--ground);
+    border: 1px solid var(--hairline-strong);
+    border-radius: var(--radius);
+    padding: 0.8rem 0.9rem;
+    width: 100%;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  textarea { resize: vertical; min-height: 8rem; line-height: 1.55; }
+  input::placeholder, textarea::placeholder { color: var(--muted); opacity: 0.8; }
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.16);
+  }
+  /* :focus-visible ger fortfarande den globala ringen för tangentbord */
+  input:invalid:not(:placeholder-shown) { border-color: #b42318; }
+
+  .note {
+    margin: 0 0 1.3rem;
+    color: var(--type-dim);
+    font-size: 0.9rem;
+  }
+  .cta {
+    display: inline-block;
+    padding: 0.9rem 1.6rem;
+    background: var(--accent);
+    color: var(--cta-text);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    border: 0;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-soft);
+    cursor: pointer;
+    transition: background 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s;
+  }
+  .cta:hover { background: var(--accent-strong); box-shadow: var(--shadow-medium); }
+  .fine {
+    margin: 1.3rem 0 0;
+    color: var(--muted);
+    font-size: 0.82rem;
+  }
+  .fine a { color: var(--accent); }
+
+  /* ————— Sidospalten ————— */
+  .card {
+    background: var(--ground);
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-soft);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .direct {
+    color: var(--navy);
+    font-size: 1.02rem;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .direct:hover { color: var(--accent); }
+  .hours { margin: 0.4rem 0 0; color: var(--muted); }
+
+  .steps {
+    list-style: none;
+    margin: 2.2rem 0 0;
+    padding: 0;
+    display: grid;
+    gap: 1.8rem;
+  }
+  .steps li { border-left: 1px solid var(--hairline); padding-left: 1.3rem; }
+  .n { color: var(--accent); }
+  .steps h2 {
+    margin: 0.5rem 0 0.5rem;
+    font-size: 1.12rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .text { color: var(--type-dim); font-size: 0.94rem; }
+
+  @media (max-width: 900px) {
+    /* Formuläret först på smalt: det ÄR sidan. Kontaktkortet och stegen
+       hamnade tidigare ovanför och sköt ner det under tre skärmar. */
+    .cols { grid-template-columns: 1fr; }
+    .aside { display: contents; }
+    .form { order: 1; }
+    .card { order: 2; margin-top: 1.6rem; }
+    .steps { order: 3; margin-top: 1.8rem; }
+  }
+  @media (max-width: 560px) {
+    .row.two { grid-template-columns: 1fr; gap: 0; }
+  }
+</style>

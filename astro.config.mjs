@@ -7,12 +7,9 @@ export default defineConfig({
   site: process.env.SITE ?? 'https://www.scandicmarketing.se',
   base: process.env.BASE_PATH ?? '/',
   trailingSlash: 'never',
-  // /particle är ett internt labb — det ska varken indexeras eller stå i
-  // sitemapen (sidan har dessutom noindex i sitt eget head).
-  integrations: [sitemap({ filter: (page) => !page.includes('/particle') })],
+  integrations: [sitemap()],
   redirects: {
     '/contact': '/kontakt',
-    '/booking': '/kontakt',
     '/artiklar': '/',
     '/tjanster': '/',
     // Ägaren säljer bara marknadsföring numera. De gamla tjänstesidorna

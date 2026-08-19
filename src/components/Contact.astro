@@ -2,6 +2,7 @@
 /* Partikelfältet ritar ägarens egen symbol till höger om uppgifterna
    (data-field="mark") — tätare och skarpare än den gamla sfären, som var
    en generisk form utan avsändare. */
+const base = import.meta.env.BASE_URL.replace(/\/+$/, '');
 ---
 <section class="contact" id="kontakt" data-field="mark">
   <div class="inner">
@@ -27,9 +28,7 @@
       </div>
     </div>
 
-    <a class="cta reveal" href="mailto:kontakt@scandicmarketing.se?subject=Boka%20ett%20samtal"
-      >Boka ett samtal <span aria-hidden="true">→</span></a
-    >
+    <a class="cta reveal" href={`${base}/booking`}>Boka ett samtal <span aria-hidden="true">→</span></a>
   </div>
 </section>
 

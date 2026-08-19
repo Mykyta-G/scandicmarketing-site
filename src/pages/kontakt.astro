@@ -11,6 +11,11 @@ import Footer from '../components/Footer.astro';
 >
   <Nav />
   <main class="kontakt-page">
+    <!-- Sidan lånar Contact-sektionen, vars rubrik är en h2 eftersom den där
+         sitter mitt i startsidans hierarki. Här är kontakt hela sidans ämne,
+         så den behöver en egen h1 — dold, för att inte dubblera rubriken som
+         redan står i sektionen. -->
+    <h1 class="sr-only">Kontakta Scandic Marketing</h1>
     <Contact />
   </main>
   <Footer />

@@ -30,8 +30,6 @@
   prefers-reduced-motion: en enda stilla, färdig bild — inga lyssnare, ingen loop.
 */
 
-import type { Formation } from './lab/types';
-
 const TAU = Math.PI * 2;
 
 // mulberry32 — deterministiskt, billigt
@@ -45,11 +43,8 @@ function rng(seed: number) {
   };
 }
 
-/* extra: valfria formationer utifrån. Partikellabbet (/particle) skickar in
-   sina kandidater den vägen, så motorn bara finns i en upplaga. */
-export function initField(canvas: HTMLCanvasElement | null, extra: Formation[] = []) {
+export function initField(canvas: HTMLCanvasElement | null) {
   if (!canvas) return;
-  const guests = new Map(extra.map((f) => [f.name, f]));
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const coarse = matchMedia('(pointer: coarse)').matches;
 
@@ -257,9 +252,6 @@ export function initField(canvas: HTMLCanvasElement | null, extra: Formation[] =
 
   function targetsFor(name: string, progress: number): number[] | null {
     const rr = rng(1234 + name.length);
-
-    const guest = guests.get(name);
-    if (guest) return guest.points(W, H, rr);
 
     if (name === 'bars') {
       // fem stigande staplar av punkter — mätbarhet. Står på resultatbandets
@@ -495,7 +487,6 @@ export function initField(canvas: HTMLCanvasElement | null, extra: Formation[] =
     logo: 1.12, mark: 1.05, drift: 0.42, bars: 0.62, shapes: 0.62, wave: 0.72,
     steps: 0.68, strand: 0.66, braid: 0.5, converge: 0.72,
   };
-  for (const f of extra) GOALS[f.name] = f.goal;
 
   let shapesEl: Element | null = null;
   let shapesPhase = -1;
@@ -767,7 +758,7 @@ void main() {
   // ————— Reducerad rörelse: en stilla, färdig bild — sedan klart —————
   if (reduced) {
     logoGate.then(() => {
-      setFormation('logo');
+      setFormation(document.querySelector('[data-field="logo"]') ? 'logo' : 'braid');
       for (let i = 0; i < N; i++) { px[i] = tx[i]; py[i] = ty[i]; }
       intensity = 1.05;
       calm = 1;
@@ -1103,9 +1094,17 @@ void main() {
   }, { passive: true });
 
   // ————— Start —————
-  setFormation('logo'); // fritt driv tills filen är dekodad
+  /* Startformationen tas ur DOM:en, inte antas. Undersidorna har ingen
+     hjälte — startade vi ändå i 'logo' ritades ordmärket tvärs över deras
+     innehåll tills man scrollat förbi något med data-field. */
+  const first = document.querySelector<HTMLElement>('[data-field]');
+  const start = document.querySelector('[data-field="logo"]')
+    ? 'logo'
+    : first?.dataset.field || 'drift';
+  setFormation(start); // fritt driv tills filen är dekodad
   logoGate.then(() => {
     if (formation === 'logo') setFormation('logo', lastProgress);
+    else if (!document.querySelector('[data-field="logo"]')) wmEl?.classList.add('wm-taken');
     // först nu viker bildfallbacken undan — annars står hjälten tom en stund
     if (hasTargets) takeOver();
   });
