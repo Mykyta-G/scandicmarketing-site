@@ -591,13 +591,24 @@ void main() {
   const takeOver = () => { wmEl?.classList.add('wm-taken'); };
 
   // Logotypen ÄR hjältens titel — vänta tills filen är dekodad innan vi samplar.
-  const logoGate = new Promise<void>((res) => {
-    const im = new Image();
-    im.decoding = 'async';
-    im.onload = () => { logoImg = im; res(); };
-    im.onerror = () => res();
-    im.src = `${import.meta.env.BASE_URL.replace(/\/+$/, '')}/img/logo.webp`;
-  });
+  const LOGO_SRC = `${import.meta.env.BASE_URL.replace(/\/+$/, '')}/img/logo.webp`;
+  let loadingLogo = false;
+  let logoTries = 0;
+  function reloadLogo() {
+    if (loadingLogo) return Promise.resolve();
+    loadingLogo = true;
+    const n = logoTries++;
+    return new Promise<void>((res) => {
+      const im = new Image();
+      im.decoding = 'async';
+      im.onload = () => { logoImg = im; loadingLogo = false; res(); };
+      im.onerror = () => { loadingLogo = false; res(); };
+      // första försöket delar naven's kopia; omförsök går förbi cachen,
+      // annars serveras samma misslyckande om och om igen
+      im.src = n ? `${LOGO_SRC}?r=${n}` : LOGO_SRC;
+    });
+  }
+  const logoGate = reloadLogo();
 
   // ————— Reducerad rörelse: en stilla, färdig bild — sedan klart —————
   if (reduced) {
@@ -636,30 +647,35 @@ void main() {
   addEventListener('pointerleave', () => { mx = my = -9999; pmx = pmy = -9999; }, { passive: true });
 
   // ————— Formationer följer scrollen —————
+  /* Ägaren räknas ut ur färska rektanglar varje bildruta, inte ur
+     IntersectionObserver-poster. Observatören levererar flera sektioner i
+     samma svall vid en snabb svep, och den som råkade ligga sist i listan
+     vann — scrollade man sedan inte mer satt fel formation kvar för alltid.
+     Ingen händelseleverans att lita på nu: sektionen vars mitt ligger
+     närmast rutans mittlinje, och som täcker den, äger fältet. */
   const sections = Array.from(document.querySelectorAll<HTMLElement>('[data-field]'));
   shapesEl = sections.find((s) => s.dataset.field === 'shapes') || null;
   stepsEl = document.querySelector('[data-field="steps"] .steps');
-  const io = new IntersectionObserver(
-    (entries) => {
-      for (const e of entries) {
-        if (e.isIntersecting) {
-          const name = (e.target as HTMLElement).dataset.field || 'drift';
-          if (name === 'shapes') { shapesPhase = -1; }
-          else if (name !== formation) setFormation(name);
-          else intensityGoal = GOALS[name] ?? 0.5;
-          if (name === 'shapes') formation = 'shapes';
-        }
-      }
-    },
-    // sektionen som täcker mitten av rutan äger formationen
-    { rootMargin: '-45% 0px -45% 0px', threshold: 0 }
-  );
-  sections.forEach((s) => io.observe(s));
+
+  function ownerField(): string | null {
+    const mid = H / 2;
+    let best: HTMLElement | null = null;
+    let bestD = Infinity;
+    for (const el of sections) {
+      const r = el.getBoundingClientRect();
+      if (r.top > mid || r.bottom < mid) continue; // täcker inte mittlinjen
+      const d = Math.abs(r.top + r.height / 2 - mid);
+      if (d < bestD) { bestD = d; best = el; }
+    }
+    return best ? best.dataset.field || 'drift' : null; // ingen? behåll den vi har
+  }
 
   // ————— Loopen —————
   let raf = 0;
   let last = performance.now();
   let running = true;
+  let ownerT = 0;
+  let retryT = 0;
 
   function tick(now: number) {
     if (!running) return;
@@ -675,6 +691,32 @@ void main() {
       if (phase !== shapesPhase) {
         shapesPhase = phase;
         setFormation('shapes', prog);
+      }
+    }
+
+    // Vem äger fältet just nu? Billigt: en handfull rektangler, var 8:e bildruta.
+    ownerT += dt;
+    if (ownerT > 0.13) {
+      ownerT = 0;
+      const owner = ownerField();
+      if (owner === 'shapes') {
+        if (formation !== 'shapes') { shapesPhase = -1; formation = 'shapes'; }
+      } else if (owner && owner !== formation) {
+        setFormation(owner);
+      } else if (owner === 'logo' && !hasTargets) {
+        // logotypfilen fanns inte när vi först försökte (avbrott, kall
+        // dev-server, tappat nät). Försök igen — annars driver hjälten
+        // fritt resten av besöket och titeln kommer aldrig tillbaka.
+        retryT += 0.13;
+        if (retryT > 0.6) {
+          retryT = 0;
+          if (logoImg) { setFormation('logo'); if (hasTargets) takeOver(); }
+          else reloadLogo().then(() => {
+            if (!logoImg || formation !== 'logo') return;
+            setFormation('logo');
+            if (hasTargets) takeOver(); // bildfallbacken viker undan först nu
+          });
+        }
       }
     }
 
