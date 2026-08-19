@@ -1,6 +1,12 @@
 ---
 /* GATE FÖRE LANSERING: skriftligt tillstånd per klient innan logotypen visas.
-   Alla märken visas som mörka navy-silhuetter på den vita marken. */
+   Alla märken visas som mörka navy-silhuetter på den vita marken.
+
+   Karusell, som på ägarens nuvarande sajt: raden glider åt vänster i jämn
+   takt och sluter sig sömlöst. Listan ligger i tre identiska set — spåret
+   flyttas exakt ett set åt vänster per varv, så skarven aldrig syns. Två set
+   hade räckt på en telefon men inte på en bred skärm, där ett ensamt set
+   lämnar ett hål efter sig. */
 const base = import.meta.env.BASE_URL.replace(/\/+$/, '');
 const logos = [
   { src: `${base}/img/client-walleye.png`, alt: 'Walleye CrossFit' },
@@ -11,20 +17,27 @@ const logos = [
   { src: `${base}/img/client-saunavant-logo.png`, alt: 'Saunavant' },
   { src: `${base}/img/client-prima-el-logo.png`, alt: 'Prima El' },
 ];
+const sets = [0, 1, 2];
 ---
 
 <section class="clients" aria-label="Några av våra samarbeten" data-field="drift">
   <div class="inner reveal">
     <p class="label">Några av våra samarbeten</p>
-    <ul>
-      {
-        logos.map((l) => (
-          <li>
-            <img src={l.src} alt={l.alt} loading="lazy" />
-          </li>
-        ))
-      }
-    </ul>
+    <div class="rail">
+      <div class="track">
+        {
+          sets.map((n) => (
+            <ul class="set" aria-hidden={n > 0 ? 'true' : undefined}>
+              {logos.map((l) => (
+                <li>
+                  <img src={l.src} alt={n === 0 ? l.alt : ''} loading="lazy" />
+                </li>
+              ))}
+            </ul>
+          ))
+        }
+      </div>
+    </div>
   </div>
 </section>
 
@@ -40,39 +53,69 @@ const logos = [
     flex-direction: column;
     gap: 1.6rem;
   }
-  ul {
-    list-style: none;
-    margin: 0;
+
+  .rail {
+    --gap: clamp(2.6rem, 6vw, 5.5rem);
+    overflow: hidden;
     padding: 2.1rem 0;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: clamp(1.2rem, 3vw, 3.5rem);
-    flex-wrap: nowrap;
     border-top: 1px solid var(--hairline);
     border-bottom: 1px solid var(--hairline);
+    /* mjuka kanter: märkena tonar in och ut i stället för att klippas av */
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 4rem, #000 calc(100% - 4rem), transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 4rem, #000 calc(100% - 4rem), transparent);
   }
-  li { min-width: 0; }
+  .track {
+    display: flex;
+    width: max-content;
+    animation: slide 46s linear infinite;
+  }
+  /* Ett varv = exakt ett set. Mellanrummet efter setet bär skarven, så att
+     avståndet mellan sista och första märket blir detsamma som inuti. */
+  @keyframes slide {
+    to { translate: -33.3333% 0; }
+  }
+  .rail:hover .track,
+  .rail:focus-within .track { animation-play-state: paused; }
+
+  .set {
+    list-style: none;
+    margin: 0;
+    padding: 0 var(--gap) 0 0;
+    display: flex;
+    align-items: center;
+    gap: var(--gap);
+  }
+  li { flex: none; }
   img {
-    height: clamp(1.3rem, 1.8vw, 2rem);
+    display: block;
+    height: clamp(1.5rem, 2vw, 2.1rem);
     width: auto;
-    max-width: 100%;
     object-fit: contain;
     opacity: 0.65;
     filter: brightness(0) invert(0.09) sepia(0.5) saturate(6) hue-rotate(195deg); /* ≈ brand-navy silhuett */
-    translate: 0 0;
-    transition: opacity 0.3s, filter 0.3s, translate 0.3s, scale 0.3s;
+    transition: opacity 0.3s, filter 0.3s, scale 0.3s;
   }
   li:hover img {
     opacity: 1;
     /* navy → brandblå (≈ #2563eb) */
     filter: brightness(0) invert(0.35) sepia(0.9) saturate(28) hue-rotate(218deg) brightness(0.98);
-    translate: 0 -4px;
-    scale: 1.05;
+    scale: 1.06;
   }
 
-  @media (max-width: 640px) {
-    ul { flex-wrap: wrap; justify-content: center; gap: 1.6rem 2.4rem; }
-    img { height: 1.6rem; }
+  /* Smal skärm: bara tre märken får plats, så en 4rem bred toning i vardera
+     kanten skulle sudda nästan hela raden. */
+  @media (max-width: 600px) {
+    .rail {
+      -webkit-mask-image: linear-gradient(90deg, transparent, #000 1.5rem, #000 calc(100% - 1.5rem), transparent);
+      mask-image: linear-gradient(90deg, transparent, #000 1.5rem, #000 calc(100% - 1.5rem), transparent);
+    }
+  }
+
+  /* Rörelsen är dekor. Står den still ska raden ändå gå att läsa i sin helhet. */
+  @media (prefers-reduced-motion: reduce) {
+    .rail { overflow-x: auto; -webkit-mask-image: none; mask-image: none; }
+    .track { animation: none; }
+    .set:not(:first-child) { display: none; }
+    .set { flex-wrap: wrap; justify-content: center; gap: 1.6rem 2.4rem; padding: 0; }
   }
 </style>

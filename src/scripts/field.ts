@@ -9,17 +9,21 @@
   ordet igen.
 
   Formationer (data-field på sektionerna):
-    logo     — ordmärket: "SCANDIC MARKETING" renderat i Inter 800 på en
-               högupplöst offscreen-canvas (efter document.fonts.ready) och
-               samplat till partikelmål; punkten efter ordet är alltid blå
+    logo     — hela logotypen: symbolen och "SCANDIC MARKETING" samplade
+               ur img/logo.webp, samma fil som naven visar. Formen är alltså
+               inte en efterlikning i Inter utan märket självt
+    mark     — enbart symbolen ur logotypen, tät och skarp (Kontakt)
     drift    — fritt flöde, låg intensitet bakom läsytor
     bars     — stigande staplar (Resultat: mätbarhet)
     shapes   — play-triangel → hårkors genom Tjänster
-    wave     — kustlinje/horisont (Break — Helsingborg vid Sundet)
-    converge — konvergenspunkt (Kontakt)
+    wave     — kustlinje/horisont (Break — Öresund)
+    steps    — stigande bana under stegtexten (Så arbetar vi)
+    converge — konvergenspunkt (fri, används i partikellabbet)
 
   prefers-reduced-motion: en enda stilla, färdig bild — inga lyssnare, ingen loop.
 */
+
+import type { Formation } from './lab/types';
 
 const TAU = Math.PI * 2;
 
@@ -34,8 +38,11 @@ function rng(seed: number) {
   };
 }
 
-export function initField(canvas: HTMLCanvasElement | null) {
+/* extra: valfria formationer utifrån. Partikellabbet (/particle) skickar in
+   sina kandidater den vägen, så motorn bara finns i en upplaga. */
+export function initField(canvas: HTMLCanvasElement | null, extra: Formation[] = []) {
   if (!canvas) return;
+  const guests = new Map(extra.map((f) => [f.name, f]));
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const coarse = matchMedia('(pointer: coarse)').matches;
 
@@ -44,10 +51,13 @@ export function initField(canvas: HTMLCanvasElement | null) {
   const DPR = Math.min(devicePixelRatio || 1, coarse ? 3 : 2); // riktiga mobiler: skarpare punkter
 
   // ————— Partikelbudget efter yta och enhet —————
-  const density = coarse ? 400 : 250;
-  const maxN = coarse ? 2000 : 6000;
-  // smala rutor behöver ett golv — ordmärket ska bära även på 375 px
-  const N = Math.max(W < 760 ? 2200 : coarse ? 1800 : 1200, Math.min(coarse ? 2400 : maxN, Math.round((W * H) / density)));
+  // Hjälten är hela logotypen numera: symbolen OCH två textrader. Bokstäverna
+  // är tunna streck — med den gamla budgeten blev de prickade konturer i
+  // stället för fyllda former, så taket är höjt rejält.
+  const density = coarse ? 280 : 128;
+  const maxN = coarse ? 3000 : 11000;
+  // smala rutor behöver ett golv — logotypen ska bära även på 375 px
+  const N = Math.max(W < 760 ? 2600 : coarse ? 2200 : 1600, Math.min(maxN, Math.round((W * H) / density)));
 
   // ————— Tillstånd —————
   const px = new Float32Array(N);
@@ -79,8 +89,8 @@ export function initField(canvas: HTMLCanvasElement | null) {
   let formation = 'drift';
   let intensity = 0.4; // global täthet/opacitet, lerpas
   let intensityGoal = 0.9;
-  let calm = 0; // 1 när ordmärket vilar — hårdare kanter, ingen glimt
-  let fontsReady = false;
+  let calm = 0; // 1 när märket vilar — hårdare kanter, ingen glimt
+  let logoImg: HTMLImageElement | null = null;
 
   // ————— Formationsmål —————
   const off = document.createElement('canvas');
@@ -93,20 +103,41 @@ export function initField(canvas: HTMLCanvasElement | null) {
     step = 2
   ) {
     const { data } = octx.getImageData(0, 0, off.width, off.height);
-    const lit: number[] = [];
-    for (let y = 0; y < off.height; y += step) {
-      for (let x = 0; x < off.width; x += step) {
-        if (data[(y * off.width + x) * 4 + 3] > 100) lit.push(x, y);
+    const lit = (st: number, into: number[] | null) => {
+      let c = 0;
+      for (let y = 0; y < off.height; y += st) {
+        for (let x = 0; x < off.width; x += st) {
+          if (data[(y * off.width + x) * 4 + 3] > 100) {
+            c++;
+            if (into) into.push(x, y);
+          }
+        }
       }
+      return c;
+    };
+
+    /* Steget ställs efter hur mycket bläck bilden faktiskt innehåller, i
+       stället för att ta var n:te träff ur en tät lista. Rasterordnad
+       gallring lägger diagonala band tvärs över fyllda ytor — symbolen blev
+       kammad i stället för solid. Nu blir rutnätet jämnt och stride ≈ 1. */
+    let st = Math.max(1, step);
+    let c = lit(st, null);
+    if (!c) return null;
+    for (let pass = 0; pass < 2 && c > maxPts * 1.15; pass++) {
+      st = Math.max(st + 1, Math.round(st * Math.sqrt(c / maxPts)));
+      c = lit(st, null);
     }
-    const n = lit.length / 2;
+
+    const pts: number[] = [];
+    lit(st, pts);
+    const n = pts.length / 2;
     if (!n) return null;
     const stride = Math.max(1, Math.floor(n / maxPts));
     const out: number[] = [];
     for (let i = 0; i < n; i += stride) {
       out.push(
-        rect.x + (lit[i * 2] / off.width) * rect.w,
-        rect.y + (lit[i * 2 + 1] / off.height) * rect.h
+        rect.x + (pts[i * 2] / off.width) * rect.w,
+        rect.y + (pts[i * 2 + 1] / off.height) * rect.h
       );
     }
     return out;
@@ -124,73 +155,39 @@ export function initField(canvas: HTMLCanvasElement | null) {
   // läget i vyn läses färskt från #wm:s getBoundingClientRect varje bildruta.
   // gBCR ger den KLISTRADE positionen (offset-kedjan ger den oklistrade) och
   // följer även innehållets scroll-transform — därför är den enda sanningen.
-  const FREE = 127; // 1/128 fritt strö i ordläget — resten bemannar glyferna
-  let wordRaw: number[] | null = null; // glyfpunkter i offscreen-pixlar
-  let wordDotRaw: number[] | null = null; // punkten "." — alltid blåa partiklar
+  const FREE = 127; // 1/128 fritt strö i logoläget — resten bemannar märket
+  let wordRaw: number[] | null = null; // logotypens punkter i offscreen-pixlar
   let wordW = 1, wordH = 1; // offscreen-mått vid samplingen
-  let wmBoxCur = { x: 0, y: 0, w: 0, h: 0 }; // ordets ruta i vyn just nu
+  let wmBoxCur = { x: 0, y: 0, w: 0, h: 0 }; // logotypens ruta i vyn just nu
+  let markRaw: number[] | null = null; // enbart symbolen, i offscreen-pixlar
+  let markW = 1, markH = 1;
 
   function sampleWord(): boolean {
-    wordRaw = null;
-    wordDotRaw = null;
-    if (!fontsReady) return false; // driv fritt tills Inter är laddad
+    // Punkterna ligger i offscreen-rymd och är oberoende av rutans storlek —
+    // samplas en gång, återanvänds vid varje omritning och varje resize.
+    if (wordRaw) return true;
+    if (!logoImg) return false; // driv fritt tills filen är dekodad
 
-    const twoLine = W < 760;
-    const fs = 220; // generös offscreen-storlek: tätheten kommer från glyferna
-    const font = `800 ${fs}px Inter, sans-serif`;
-    const lines = twoLine ? ['SCANDIC', 'MARKETING'] : ['SCANDIC MARKETING'];
+    const iw = logoImg.naturalWidth || 480;
+    const ih = logoImg.naturalHeight || 159;
+    // rita upp märket stort: fler räknare i samplingen, mjukare kant
+    off.width = Math.min(1920, Math.round(iw * 3));
+    off.height = Math.round((off.width * ih) / iw);
+    octx.clearRect(0, 0, off.width, off.height);
+    octx.imageSmoothingQuality = 'high';
+    octx.drawImage(logoImg, 0, 0, off.width, off.height);
 
-    // mät med samma spärrning som CSS-fallbacken (-0.02em)
-    try { (octx as any).letterSpacing = `${(-0.02 * fs).toFixed(1)}px`; } catch { /* äldre motorer */ }
-    octx.font = font;
-    const widths = lines.map((l) => octx.measureText(l).width);
-
-    const r = fs * 0.088; // punktens radie
-    const gap = fs * 0.1;
-    const lineH = fs * 1.14;
-    const last = lines.length - 1;
-    const wAll = Math.max(...widths.map((w2, i) => (i === last ? w2 + gap + r * 2 : w2)));
-    const base0 = fs * 0.76; // versalhöjd ≈ 0.72em — lite luft ovanför
-    const hAll = base0 + last * lineH + fs * 0.08;
-
-    off.width = Math.min(4096, Math.ceil(wAll) + 6);
-    off.height = Math.ceil(hAll);
-    // resize nollställer kontexten — sätt om allt
-    try { (octx as any).letterSpacing = `${(-0.02 * fs).toFixed(1)}px`; } catch { /* — */ }
-    octx.font = font;
-    octx.textAlign = 'left';
-    octx.textBaseline = 'alphabetic';
-    octx.fillStyle = octx.strokeStyle = '#fff';
-    octx.lineWidth = fs * 0.015; // hårfin förstärkning — räcker utan att täppa räknarna
-    for (let i = 0; i < lines.length; i++) {
-      octx.fillText(lines[i], 2, base0 + i * lineH);
-      octx.strokeText(lines[i], 2, base0 + i * lineH);
-    }
-
-    // nästan hela budgeten på glyferna — bara ett tunt strö förblir fritt.
-    // Samplas i offscreen-pixlar; läget i vyn läggs på i layoutWord.
-    const maxPts = Math.min(4200, Math.max(700, Math.round(N * 0.8)));
-    const t = sampleOffscreen(maxPts, { x: 0, y: 0, w: off.width, h: off.height });
+    // nästan hela budgeten på märket — bara ett tunt strö förblir fritt
+    const maxPts = Math.min(7600, Math.max(900, Math.round(N * 0.85)));
+    const t = sampleOffscreen(maxPts, { x: 0, y: 0, w: off.width, h: off.height }, 2);
     if (!t) return false;
     wordRaw = t;
     wordW = off.width;
     wordH = off.height;
-
-    // den blå punkten: egen liten fyllotaxi-skiva efter sista raden
-    const dcx = 2 + widths[last] + gap + r;
-    const dcy = base0 + last * lineH - r * 0.9;
-    const nd = Math.max(28, Math.round(N * 0.018));
-    const golden = Math.PI * (3 - Math.sqrt(5));
-    wordDotRaw = [];
-    for (let i = 0; i < nd; i++) {
-      const rad = r * 0.92 * Math.sqrt(i / nd);
-      const a = i * golden;
-      wordDotRaw.push(dcx + Math.cos(a) * rad, dcy + Math.sin(a) * rad);
-    }
     return true;
   }
 
-  // Ordets ruta i vyn — läses färskt VARJE bildruta ordet visas, aldrig
+  // Logotypens ruta i vyn — läses färskt VARJE bildruta den visas, aldrig
   // cachad. gBCR på #wm är sanningen i alla lägen: klistrad, oklistrad och
   // mitt i innehållets scroll-transform (lyft + skalat).
   function wmViewBox() {
@@ -210,28 +207,17 @@ export function initField(canvas: HTMLCanvasElement | null) {
     return fitRect(wordW / wordH, W < 760 ? 0.86 : 0.64, 0.4, 0.5, 0.42);
   }
 
-  // Lägg glyf- och punktmålen i rutan. Deterministisk (samma frön) — kan
-  // köras om varje bildruta utan att partiklarna byter plats inbördes.
+  // Lägg märkets punkter i rutan. Deterministisk (samma frön) — kan köras om
+  // varje bildruta utan att partiklarna byter plats inbördes.
   function layoutWord(box: { x: number; y: number; w: number; h: number }) {
     wmBoxCur = box;
     if (!wordRaw) return;
     const m = wordRaw.length / 2;
     const sx = box.w / wordW;
     const sy = box.h / wordH;
-    const md = wordDotRaw ? wordDotRaw.length / 2 : 0;
-    const need = md ? Math.min(md * 2, Math.round(N * 0.04)) : 0;
-    let di = 0;
     for (let i = 0; i < N; i++) {
-      // punkten "." bemannas av blåa partiklar (färgval 1 = #2563eb)
-      if (di < need && seeds[i * 3 + 1] === 1 && (i & FREE) !== FREE) {
-        const j = di % md;
-        tx[i] = box.x + wordDotRaw![j * 2] * sx + (seeds[i * 3] - 1.95) * 0.6;
-        ty[i] = box.y + wordDotRaw![j * 2 + 1] * sy + (seeds[i * 3 + 2] - Math.PI) * 0.3;
-        di++;
-        continue;
-      }
       const j = perm[i] % m;
-      // ordmärket kräver stillhet: nästan inget spridningsbrus kring målet
+      // logotypen kräver stillhet: nästan inget spridningsbrus kring målet
       tx[i] = box.x + wordRaw[j * 2] * sx + (seeds[i * 3] - 1.95) * 0.35;
       ty[i] = box.y + wordRaw[j * 2 + 1] * sy + (seeds[i * 3 + 2] - Math.PI) * 0.14;
     }
@@ -239,6 +225,9 @@ export function initField(canvas: HTMLCanvasElement | null) {
 
   function targetsFor(name: string, progress: number): number[] | null {
     const rr = rng(1234 + name.length);
+
+    const guest = guests.get(name);
+    if (guest) return guest.points(W, H, rr);
 
     if (name === 'bars') {
       // fem stigande staplar av punkter — mätbarhet
@@ -319,11 +308,13 @@ export function initField(canvas: HTMLCanvasElement | null) {
 
     if (name === 'steps') {
       /* Så arbetar vi: en stigande bana över hela bredden med tre hållpunkter
-         — kartläggning, produktion, avläsning. Ligger lågt i bilden så den
-         inte krockar med stegtexten. */
+         — kartläggning, produktion, avläsning. Bandet läggs i luften UNDER
+         steglistan, mätt färskt ur layouten, så att texten aldrig hamnar
+         ovanpå banan hur långt man än scrollat. */
+      const band = stepsBand();
       const out: number[] = [];
       const x0 = W * 0.06, x1 = W * 0.94;
-      const yLo = H * 0.88, yHi = H * 0.62;
+      const yLo = band.bottom, yHi = band.top;
       const stops = [0.08, 0.5, 0.92];
       const pathY = (u: number) =>
         yLo + (yHi - yLo) * (u * u * (3 - 2 * u)) + Math.sin(u * TAU * 1.4) * H * 0.012;
@@ -340,7 +331,7 @@ export function initField(canvas: HTMLCanvasElement | null) {
         const u = stops[s];
         const cx = x0 + (x1 - x0) * u;
         const cy = pathY(u);
-        const rad = Math.min(W, H) * 0.045;
+        const rad = Math.min(Math.min(W, H) * 0.045, (yLo - yHi) * 0.42);
         const ring = 190;
         for (let i = 0; i < ring; i++) {
           const a = (i / ring) * TAU;
@@ -353,6 +344,39 @@ export function initField(canvas: HTMLCanvasElement | null) {
             out.push(cx + Math.cos(a) * d, cy + Math.sin(a) * d);
           }
         }
+      }
+      return out;
+    }
+
+    if (name === 'mark') {
+      /* Enbart symbolen ur logotypen — tät och skarp. Symbolen ligger i
+         x 8–122, y 8–150 av den 480×159 stora filen. */
+      if (!markRaw) {
+        if (!logoImg) return null;
+        const k = (logoImg.naturalWidth || 480) / 480;
+        off.width = 420;
+        off.height = Math.round((420 * 143) / 115);
+        octx.clearRect(0, 0, off.width, off.height);
+        octx.imageSmoothingQuality = 'high';
+        octx.drawImage(logoImg, 8 * k, 8 * k, 115 * k, 143 * k, 0, 0, off.width, off.height);
+        const pts = sampleOffscreen(3200, { x: 0, y: 0, w: off.width, h: off.height }, 2);
+        if (!pts) return null;
+        markRaw = pts; markW = off.width; markH = off.height;
+      }
+      // brett: till höger om kontaktuppgifterna. Smalt: nere till höger,
+      // där sidan är tom — annars ligger den rakt under raderna.
+      // brett: en tät symbol bredvid uppgifterna. Smalt: ingen fri yta finns
+      // — då blir den i stället en stor, blek vattenstämpel bakom allt.
+      const narrow = W < 900;
+      const box = narrow
+        ? fitRect(markW / markH, 0.72, 0.46, 0.5, 0.52)
+        : fitRect(markW / markH, 0.22, 0.62, 0.78, 0.5);
+      const out: number[] = [];
+      for (let i = 0; i < markRaw.length; i += 2) {
+        out.push(
+          box.x + (markRaw[i] / markW) * box.w,
+          box.y + (markRaw[i + 1] / markH) * box.h
+        );
       }
       return out;
     }
@@ -376,12 +400,38 @@ export function initField(canvas: HTMLCanvasElement | null) {
   }
 
   const GOALS: Record<string, number> = {
-    logo: 1.12, drift: 0.42, bars: 0.62, shapes: 0.62, wave: 0.72, steps: 0.68, converge: 0.72,
+    logo: 1.12, mark: 1.05, drift: 0.42, bars: 0.62, shapes: 0.62, wave: 0.72, steps: 0.68, converge: 0.72,
   };
+  for (const f of extra) GOALS[f.name] = f.goal;
 
   let shapesEl: Element | null = null;
   let shapesPhase = -1;
   let lastProgress = 0;
+  let stepsEl: Element | null = null;
+  let stepsTop = -1e9;
+  let stepsTight = false; // listan är högre än rutan — ingen fri yta under den
+
+  /* Steglistans underkant i vyn — banan lägger sig i luften därunder.
+     På en telefon står stegen i en spalt och listan är högre än skärmen: då
+     finns ingen sådan luft, och banan får i stället ligga längst ner och
+     tonas ner till vattenstämpel. Läsbarheten går före effekten. */
+  function stepsBand() {
+    let top = H * 0.68;
+    stepsTight = false;
+    if (stepsEl) {
+      const r = stepsEl.getBoundingClientRect();
+      if (r.height > 4) {
+        // Marginalen krymper när luften under listan är knapp — men banan
+        // flyttas ALDRIG upp i texten för att få plats. Är luften helt slut
+        // (listan högre än rutan) blir banan en blek vattenstämpel längst ner.
+        const room = H - r.bottom;
+        top = r.bottom + Math.min(Math.max(28, H * 0.06), Math.max(12, room * 0.28));
+        stepsTight = room < H * 0.12;
+      }
+    }
+    top = Math.max(H * 0.12, Math.min(top, H * 0.9));
+    return { top, bottom: Math.min(H * 0.99, top + Math.min(H * 0.23, 210)) };
+  }
 
   function setFormation(name: string, progress = 0) {
     lastProgress = progress;
@@ -396,13 +446,19 @@ export function initField(canvas: HTMLCanvasElement | null) {
     const t = targetsFor(name, progress);
     formation = name;
     intensityGoal = GOALS[name] ?? 0.5;
+    // ligger formen bakom text tonas den ner till vattenstämpel
+    if (name === 'steps' && stepsTight) intensityGoal = 0.34;
+    if (name === 'mark' && W < 900) intensityGoal = 0.4;
     if (!t) { hasTargets = false; return; }
     hasTargets = true;
     const m = t.length / 2;
+    // symbolen ska läsas som en form, inte som ett moln — nästan inget brus
+    const jx = name === 'mark' ? 0.6 : 3;
+    const jy = name === 'mark' ? 0.4 : 2;
     for (let i = 0; i < N; i++) {
       const j = perm[i] % m;
-      tx[i] = t[j * 2] + (seeds[i * 3] - 1.95) * 3;
-      ty[i] = t[j * 2 + 1] + (seeds[i * 3 + 2] - Math.PI) * 2;
+      tx[i] = t[j * 2] + (seeds[i * 3] - 1.95) * jx;
+      ty[i] = t[j * 2 + 1] + (seeds[i * 3 + 2] - Math.PI) * jy;
     }
   }
 
@@ -534,15 +590,18 @@ void main() {
   const wmEl = document.getElementById('wm');
   const takeOver = () => { wmEl?.classList.add('wm-taken'); };
 
-  const fontsGate = Promise.all([
-    document.fonts.load('800 32px Inter'),
-    document.fonts.ready,
-  ]).catch(() => {});
+  // Logotypen ÄR hjältens titel — vänta tills filen är dekodad innan vi samplar.
+  const logoGate = new Promise<void>((res) => {
+    const im = new Image();
+    im.decoding = 'async';
+    im.onload = () => { logoImg = im; res(); };
+    im.onerror = () => res();
+    im.src = `${import.meta.env.BASE_URL.replace(/\/+$/, '')}/img/logo.webp`;
+  });
 
   // ————— Reducerad rörelse: en stilla, färdig bild — sedan klart —————
   if (reduced) {
-    fontsGate.then(() => {
-      fontsReady = true;
+    logoGate.then(() => {
       setFormation('logo');
       for (let i = 0; i < N; i++) { px[i] = tx[i]; py[i] = ty[i]; }
       intensity = 1.05;
@@ -579,6 +638,7 @@ void main() {
   // ————— Formationer följer scrollen —————
   const sections = Array.from(document.querySelectorAll<HTMLElement>('[data-field]'));
   shapesEl = sections.find((s) => s.dataset.field === 'shapes') || null;
+  stepsEl = document.querySelector('[data-field="steps"] .steps');
   const io = new IntersectionObserver(
     (entries) => {
       for (const e of entries) {
@@ -618,6 +678,13 @@ void main() {
       }
     }
 
+    // Så arbetar vi: banan följer steglistan i stället för att stå still i
+    // vyn medan texten glider upp i den
+    if (formation === 'steps' && stepsEl) {
+      const b = stepsBand();
+      if (Math.abs(b.top - stepsTop) > 2) { stepsTop = b.top; setFormation('steps'); }
+    }
+
     intensity += (intensityGoal - intensity) * Math.min(1, dt * 2.5);
     const wordMode = hasTargets && formation === 'logo';
 
@@ -642,7 +709,10 @@ void main() {
       disp = p * p * (3 - 2 * p);
     }
 
-    calm += ((wordMode ? 1 - disp : 0) - calm) * Math.min(1, dt * 3);
+    // calm = skarpt läge: större, hårdare punkter. Gäller logotypen medan den
+    // vilar, och symbolen i Kontakt — båda ska läsas som märket, inte som dis.
+    const sharp = wordMode ? 1 - disp : formation === 'mark' && hasTargets ? 1 : 0;
+    calm += (sharp - calm) * Math.min(1, dt * 3);
 
     // kritiskt dämpade fjädrar: partiklarna anländer, stannar och står stilla
     const damp = Math.exp(-(hasTargets ? (wordMode ? 8 : 6.2) : 1.3) * dt);
@@ -760,11 +830,11 @@ void main() {
   }, { passive: true });
 
   // ————— Start —————
-  takeOver(); // renderaren finns — partiklarna äger ordmärket
-  setFormation('logo'); // fritt driv tills typsnittet är klart
-  fontsGate.then(() => {
-    fontsReady = true;
+  setFormation('logo'); // fritt driv tills filen är dekodad
+  logoGate.then(() => {
     if (formation === 'logo') setFormation('logo', lastProgress);
+    // först nu viker bildfallbacken undan — annars står hjälten tom en stund
+    if (hasTargets) takeOver();
   });
   raf = requestAnimationFrame(tick);
 

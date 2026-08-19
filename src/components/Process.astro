@@ -36,8 +36,10 @@ const steps = [
 </section>
 
 <style>
+  /* Extra luft nedtill: den stigande banan lägger sig i tomrummet under
+     steglistan i stället för tvärs över texten. */
   .process {
-    padding: clamp(5rem, 12vh, 9rem) 0;
+    padding: clamp(5rem, 12vh, 9rem) 0 clamp(9rem, 24vh, 16rem);
   }
   .inner {
     max-width: var(--page-max);

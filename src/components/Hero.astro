@@ -1,20 +1,26 @@
+---
+const base = import.meta.env.BASE_URL.replace(/\/+$/, '');
+---
+
 <div class="hero-pin">
   <section class="hero" data-field="logo">
     <div class="hero-content" id="hero-content">
-      <p class="label kicker l0"><span class="tick" aria-hidden="true"></span>Marknadsföringsbyrå — Helsingborg</p>
+      <p class="label kicker l0"><span class="tick" aria-hidden="true"></span>Marknadsföringsbyrå — Norden</p>
 
       <!-- Rubriken finns kvar för sök och skärmläsare; partikelfältet är den synliga titeln. -->
       <h1 class="sr-only">Scandic Marketing</h1>
 
-      <!-- Fallback-ordmärke: syns utan JS (och tills fältet tagit över).
-           Partiklarna lägger sig exakt i den här rutan — den är måttstocken. -->
+      <!-- Hjältens titel ÄR logotypen. Partiklarna samplas ur exakt samma fil
+           och lägger sig i den här rutan — bilden är måttstocken, inte en
+           ungefärlig återgivning i Inter. Syns utan JS och tills fältet
+           tagit över; bredd/höjd är satta så rutan står stilla medan den laddar. -->
       <div class="wm" id="wm" aria-hidden="true">
-        <span class="wm-line">Scandic</span><span class="wm-sp"> </span><span class="wm-line">Marketing<span class="dot">.</span></span>
+        <img src={`${base}/img/logo.webp`} alt="" width="480" height="159" fetchpriority="high" />
       </div>
 
       <p class="sub l2">
         Digital marknadsföring som går att mäta —
-        i&nbsp;Helsingborg och resten av Norden.
+        i&nbsp;hela Norden.
       </p>
       <div class="actions l3">
         <a class="cta" href="#kontakt">Boka ett samtal <span aria-hidden="true">→</span></a>
@@ -104,22 +110,16 @@
     to { width: 2rem; }
   }
 
-  /* Ordmärkesplatsen: samma slot i hierarkin som rubriken hade.
-     Utan JS är detta hjältens titel; med JS ritas den av partiklarna. */
+  /* Logotypens plats: samma slot i hierarkin som rubriken hade.
+     Utan JS är bilden hjältens titel; med JS ritas samma form av partiklarna. */
   .wm {
-    width: fit-content;
+    width: min(56rem, 88vw);
     margin-inline: auto;
-    font-size: clamp(2.8rem, 7.4vw, 6.1rem);
-    font-weight: 800;
-    line-height: 1.08;
-    letter-spacing: -0.02em;
-    text-transform: uppercase;
-    color: var(--navy);
   }
-  .wm .dot { color: var(--accent); }
-  @media (max-width: 759px) {
-    .wm-line { display: block; }
-    .wm-sp { display: none; }
+  .wm img {
+    display: block;
+    width: 100%;
+    height: auto;
   }
 
   .sub {

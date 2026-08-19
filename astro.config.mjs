@@ -7,7 +7,9 @@ export default defineConfig({
   site: process.env.SITE ?? 'https://www.scandicmarketing.se',
   base: process.env.BASE_PATH ?? '/',
   trailingSlash: 'never',
-  integrations: [sitemap()],
+  // /particle är ett internt labb — det ska varken indexeras eller stå i
+  // sitemapen (sidan har dessutom noindex i sitt eget head).
+  integrations: [sitemap({ filter: (page) => !page.includes('/particle') })],
   redirects: {
     '/contact': '/kontakt',
     '/booking': '/kontakt',

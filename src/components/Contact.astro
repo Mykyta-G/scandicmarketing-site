@@ -1,6 +1,9 @@
 ---
+/* Partikelfältet ritar ägarens egen symbol till höger om uppgifterna
+   (data-field="mark") — tätare och skarpare än den gamla sfären, som var
+   en generisk form utan avsändare. */
 ---
-<section class="contact" id="kontakt" data-field="converge">
+<section class="contact" id="kontakt" data-field="mark">
   <div class="inner">
     <p class="label section-label reveal">05 — Kontakt</p>
     <h2 class="display dash split">Berätta vad ni vill bygga.</h2>
@@ -49,7 +52,10 @@
 
   .rows {
     border-top: 1px solid var(--hairline);
-    max-width: 44rem;
+    max-width: min(44rem, 60%);
+  }
+  @media (max-width: 900px) {
+    .rows { max-width: 44rem; }
   }
   .row {
     display: grid;
