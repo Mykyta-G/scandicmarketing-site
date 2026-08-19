@@ -2,11 +2,13 @@
 const base = import.meta.env.BASE_URL.replace(/\/+$/, '');
 ---
 
-<section class="break" aria-label="Bra marknadsföring märks. Vår mäts." data-field="wave">
+<section class="break" aria-label="Marknadsföring ska ge mer än den kostar." data-field="wave">
   <div class="content">
+    <!-- Brytraden bryts efter "mer": båda halvorna blir ungefär lika långa,
+         och radbrytningen landar på vändningen i meningen. -->
     <p class="line display split">
-      Bra marknadsföring <span class="hl">märks</span><span class="dot">.</span><br />
-      Vår <span class="hl">mäts</span><span class="dot">.</span>
+      Marknadsföring ska ge <span class="hl">mer</span><br />
+      än den <span class="hl">kostar</span><span class="dot">.</span>
     </p>
     <a class="cta reveal" href={`${base}/booking`}>Boka ett samtal <span aria-hidden="true">→</span></a>
   </div>

@@ -146,7 +146,11 @@ button { font: inherit; }
 }
 
 /* ————— Blue underline: highlight a key word, sibling of .dash ————— */
-.hl {
+.hl,
+/* Ordavslöjandet lägger varje ord i en inline-block, och understrykningar
+   målas inte över inline-block-barn — utan den här raden syns markeringen
+   aldrig i en rubrik som också är .split. */
+.hl .w {
   text-decoration: underline;
   text-decoration-color: var(--accent);
   text-decoration-thickness: 3px;
