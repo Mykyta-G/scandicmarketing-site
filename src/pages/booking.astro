@@ -41,6 +41,17 @@ const times = ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00'];
         <h1 class="display dash split">Berätta vad ni vill uppnå.</h1>
       </header>
 
+      <!-- Kvittensen ersätter formuläret på plats. Besökaren ska inte behöva
+           lämna sidan eller gissa om förfrågan gick fram. -->
+      <div class="form done" id="booking-done" hidden>
+        <p class="tick" aria-hidden="true">✓</p>
+        <h2 class="display">Tack — vi har din förfrågan.</h2>
+        <p class="donetext">
+          Vi hör av oss inom en arbetsdag med tid och plats. Brådskar det når
+          du oss på <a href="tel:+46769298501">+46 76 929 85 01</a>.
+        </p>
+      </div>
+
       <form class="form reveal" id="booking-form" novalidate>
         <div class="row two">
           <p class="field">
@@ -90,9 +101,7 @@ const times = ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00'];
 
         <div class="send">
           <button class="cta" type="submit">Skicka förfrågan <span aria-hidden="true">→</span></button>
-          <p class="note" id="form-note" role="status" aria-live="polite">
-            Knappen öppnar din e-post med uppgifterna ifyllda.
-          </p>
+          <p class="note" id="form-note" role="status" aria-live="polite"></p>
         </div>
 
         <ul class="promises" aria-label="Vad som gäller">
@@ -130,37 +139,98 @@ const times = ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00'];
 </script>
 
 <script>
-  /* Statisk sajt: ingen endpoint tar emot posten. Vi bygger i stället ett
-     färdigt mejl och lämnar över till besökarens e-postklient. Validering
-     körs först, så man inte skickas iväg med ett halvfyllt formulär. */
+  /* Inlämning.
+
+     I första hand postas formuläret till samma Supabase-funktion som ägarens
+     nuvarande sajt använder: besökaren stannar kvar och får en kvittens.
+
+     Saknas konfigurationen faller vi tillbaka på att öppna e-postklienten
+     med allt ifyllt. Sämre — ingen kvittens, inget register — men det
+     fungerar överallt, och en knapp som inte gör något vore värre. */
+  import { SUPABASE_URL, SUPABASE_ANON_KEY, BOOKING_FN, SERVICE, canPost } from '../config/booking';
+
   const form = document.getElementById('booking-form') as HTMLFormElement | null;
+  const doneEl = document.getElementById('booking-done');
   const note = document.getElementById('form-note');
-  form?.addEventListener('submit', (e) => {
-    e.preventDefault();
-    if (!form.reportValidity()) return;
+  const btn = form?.querySelector('button[type=submit]') as HTMLButtonElement | null;
 
-    const v = (n: string) =>
-      (form.elements.namedItem(n) as HTMLInputElement | null)?.value.trim() || '';
+  if (note) {
+    note.textContent = canPost
+      ? ''
+      : 'Knappen öppnar din e-post med uppgifterna ifyllda.';
+  }
 
-    const lines = [
-      `Namn: ${v('name')}`,
-      `E-post: ${v('email')}`,
-      v('phone') && `Telefon: ${v('phone')}`,
-      v('company') && `Företag: ${v('company')}`,
-      v('preferredDate') && `Önskat datum: ${v('preferredDate')}`,
-      v('preferredTime') && `Önskad tid: ${v('preferredTime')}`,
+  const values = (f: HTMLFormElement) => {
+    const o: Record<string, string> = { service: SERVICE };
+    for (const [k, v] of new FormData(f).entries()) o[k] = String(v).trim();
+    return o;
+  };
+
+  const mailto = (v: Record<string, string>) => {
+    const rows = [
+      `Namn: ${v.name}`,
+      `E-post: ${v.email}`,
+      v.phone && `Telefon: ${v.phone}`,
+      v.company && `Företag: ${v.company}`,
+      v.preferredDate && `Önskat datum: ${v.preferredDate}`,
+      v.preferredTime && `Önskad tid: ${v.preferredTime}`,
       '',
       'Om projektet:',
-      v('message'),
+      v.message,
     ].filter(Boolean);
-
-    const href =
+    location.href =
       'mailto:kontakt@scandicmarketing.se' +
-      `?subject=${encodeURIComponent('Bokningsförfrågan — ' + (v('company') || v('name')))}` +
-      `&body=${encodeURIComponent(lines.join('\n'))}`;
+      `?subject=${encodeURIComponent('Bokningsförfrågan — ' + (v.company || v.name))}` +
+      `&body=${encodeURIComponent(rows.join('\n'))}`;
+  };
 
-    if (note) note.textContent = 'Öppnar din e-post — tryck skicka i mejlet så har vi förfrågan.';
-    location.href = href;
+  const succeed = () => {
+    form?.setAttribute('hidden', '');
+    doneEl?.removeAttribute('hidden');
+    doneEl?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  };
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!form.reportValidity()) return;
+    const v = values(form);
+
+    if (!canPost) { mailto(v); return; }
+
+    btn?.setAttribute('disabled', '');
+    const label = btn?.textContent ?? '';
+    if (btn) btn.textContent = 'Skickar…';
+    if (note) note.textContent = '';
+
+    try {
+      const res = await fetch(`${SUPABASE_URL}/functions/v1/${BOOKING_FN}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify(v),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      succeed();
+    } catch (err) {
+      /* Ingen alert-ruta: den blockerar sidan och säger inget om vad man gör
+         nu. Felet står kvar i formuläret med en väg vidare — och mejlvägen
+         som reserv, så förfrågan inte går förlorad. */
+      if (note) {
+        note.innerHTML =
+          'Det gick inte att skicka just nu. ' +
+          '<button type="button" class="linkish" id="fallback">Skicka som e-post i stället</button>' +
+          ' eller ring +46 76 929 85 01.';
+        note.classList.add('is-error');
+        document.getElementById('fallback')?.addEventListener('click', () => mailto(v));
+      }
+      console.error('Bokning misslyckades:', err);
+    } finally {
+      btn?.removeAttribute('disabled');
+      if (btn && label) btn.textContent = label;
+    }
   });
 </script>
 
@@ -259,7 +329,33 @@ const times = ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00'];
     transition: background 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s;
   }
   .cta:hover { background: var(--accent-strong); box-shadow: var(--shadow-medium); }
-  .note { margin: 0; color: var(--type-dim); font-size: 0.84rem; max-width: 22rem; }
+  .note { margin: 0; color: var(--type-dim); font-size: 0.84rem; max-width: 24rem; }
+  .note:empty { display: none; }
+  .note.is-error { color: #b42318; }
+  .linkish {
+    font: inherit;
+    color: var(--accent);
+    background: none;
+    border: 0;
+    padding: 0;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  /* Kvittensen */
+  .done { text-align: center; padding: clamp(2.4rem, 6vw, 4rem) clamp(1.2rem, 3vw, 2rem); }
+  .tick {
+    margin: 0 auto 1.1rem;
+    width: 3rem; height: 3rem;
+    display: grid; place-items: center;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--cta-text);
+    font-size: 1.5rem;
+  }
+  .done h2 { font-size: clamp(1.4rem, 2.6vw, 1.9rem); font-weight: 700; letter-spacing: -0.02em; }
+  .donetext { margin: 0.8rem auto 0; max-width: 32ch; color: var(--type-dim); font-size: 0.97rem; }
+  .donetext a { color: var(--accent); }
 
   .direct-line {
     margin: 0.9rem 0 0;
