@@ -529,11 +529,28 @@ export function initField(canvas: HTMLCanvasElement | null, extra: Formation[] =
   function setFormation(name: string, progress = 0) {
     lastProgress = progress;
     if (name === 'logo') {
+      const reentry = formation !== 'logo';
       formation = 'logo';
       intensityGoal = GOALS.logo;
       if (!sampleWord()) { hasTargets = false; return; }
       hasTargets = true;
       layoutWord(wmViewBox()); // och sedan varje bildruta i loopen
+
+      /* Tillbaka till toppen efter att ha varit nere på sidan: ordet ska
+         inte bara stå där. Partiklarna får en utåtriktad knuff från ordets
+         mitt — de kastas ut och fjädern samlar ihop dem igen. Samma
+         explosion som på vägen ner, fast baklänges. */
+      if (reentry) {
+        const cx = wmBoxCur.x + wmBoxCur.w / 2;
+        const cy = wmBoxCur.y + wmBoxCur.h / 2;
+        for (let i = 0; i < N; i++) {
+          const dx = px[i] - cx, dy = py[i] - cy;
+          const d = Math.hypot(dx, dy) || 1;
+          const kick = 620 + seeds[i * 3 + 2] * 150;
+          vx[i] += (dx / d) * kick;
+          vy[i] += (dy / d) * kick - 120; // en aning uppåt: lyft, inte ras
+        }
+      }
       return;
     }
     if (formation !== name) anchorPrevY = NaN;
@@ -581,6 +598,9 @@ export function initField(canvas: HTMLCanvasElement | null, extra: Formation[] =
      och fjädern har inget att ta igen: figuren sitter fast i sidan och
      scrollar som vilket innehåll som helst. Fjädern får sköta formen, inte
      transporten. */
+  let pinBottom = H; // hjältepinnens underkant i vyn — trådarnas fäste
+  let pinPrev = NaN;
+  let dispS = 0; // utjämnad upplösningsgrad
   let anchorPrevY = NaN;
   function rideAnchor(name: string) {
     const r = anchorRect(name);
@@ -810,6 +830,7 @@ void main() {
   let running = true;
   let ownerT = 0;
   let retryT = 0;
+  let pinEl: HTMLElement | null = null;
 
   function tick(now: number) {
     if (!running) return;
@@ -827,6 +848,14 @@ void main() {
         setFormation('shapes', prog);
       }
     }
+
+    /* Trådarnas fäste läses färskt: de hänger i hjältepinnen, inte i rutan.
+       Utan detta står de kvar mitt i vyn och följer med skärmen nedåt — de
+       ska tvärtom ligga still i sidan och scrolla ut ur bilden. */
+    if (!pinEl) pinEl = document.querySelector('.hero-pin');
+    if (pinEl) pinBottom = pinEl.getBoundingClientRect().bottom;
+    const dPin = Number.isFinite(pinPrev) ? pinBottom - pinPrev : 0;
+    pinPrev = pinBottom;
 
     // Vem äger fältet just nu? Billigt: en handfull rektangler, var 8:e bildruta.
     ownerT += dt;
@@ -888,15 +917,34 @@ void main() {
 
     // Hjältens upplösning: ordet släpper taget i takt med scrollen och
     // samlar ihop sig igen på vägen upp — övergången ÄR effekten.
+    /* Upplösningsgraden läses inte rakt av scrollpositionen. Ett hjul
+       levererar scroll i klumpar om 100–120 px; läser man dem direkt hoppar
+       morfningen i samma takt och trådarna ser ut att skaka. Värdet jagar
+       i stället sitt mål med en egen tidskonstant, så rycken jämnas ut utan
+       att övergången blir långsammare. */
     let disp = 0;
     if (wordMode) {
       const p = Math.min(Math.max(scrollY / (H * 0.5), 0), 1);
-      disp = p * p * (3 - 2 * p);
+      dispS += (p * p * (3 - 2 * p) - dispS) * Math.min(1, dt * 7);
+      disp = dispS;
+    } else {
+      dispS = 0;
     }
 
     // calm = skarpt läge: större, hårdare punkter. Gäller logotypen medan den
     // vilar, och symbolen i Kontakt — båda ska läsas som märket, inte som dis.
     const sharp = wordMode ? 1 - disp : formation === 'mark' && hasTargets ? 1 : 0;
+    /* Trådarna hänger i pinnen och pinnen rör sig med scrollen. Utan detta
+       drar fjädern partiklarna efter de nya målen och hela knippet skakar
+       vid snabb scroll. Flytta dem lika mycket som fästet flyttade sig, i
+       samma bildruta — men bara i den mån de faktiskt är trådar: ordet
+       självt sitter i den klistrade hjälten och ska inte flyttas alls. */
+    if (wordMode && disp > 0.002 && dPin !== 0 && Math.abs(dPin) < H * 1.5) {
+      const gAll = Math.min(disp / 0.42, 1);
+      const ride = dPin * gAll * gAll * (3 - 2 * gAll);
+      if (ride !== 0) for (let i = 0; i < N; i++) py[i] += ride;
+    }
+
     calm += (sharp - calm) * Math.min(1, dt * 3);
 
     // kritiskt dämpade fjädrar: partiklarna anländer, stannar och står stilla
@@ -947,14 +995,17 @@ void main() {
           const ph = seeds[i * 3 + 2];
           const sz = (seeds[i * 3] - 1.2) / 1.5; // 0..1 ur storleksfröet
 
-          // akt 1: utåt
-          const blast = Math.min(disp / 0.26, 1);
-          const rad = blast * H * (0.22 + 0.5 * sz);
+          /* Knuffen utåt är bara en knuff — inget moln. Tidigare svällde
+             ordet till en skärmfyllande grå sky som låg kvar en hel
+             skärmhöjd innan trådarna tog form. Nu släpper bokstäverna och
+             dras direkt in i trådarna: ingen mellanbild. */
+          const blast = Math.min(disp / 0.1, 1);
+          const rad = blast * H * (0.05 + 0.11 * sz);
           txi += Math.cos(ph * 3.7) * rad;
           tyi += (Math.sin(ph * 2.9) - 0.7) * rad;
 
-          // akt 2: ner i två trådar
-          const g = disp <= 0.18 ? 0 : Math.min((disp - 0.18) / 0.62, 1);
+          // och genast ner i två trådar
+          const g = Math.min(disp / 0.42, 1);
           if (g > 0) {
             const gather = g * g * (3 - 2 * g);
             const side = i & 1 ? 1 : -1;
@@ -973,7 +1024,8 @@ void main() {
               W * 0.5 +
               side * (W * splay + thick) +
               Math.sin(u * TAU * 1.35 + animT * 0.3 + (side > 0 ? 0 : 2.1)) * W * 0.05;
-            const sy = -H * 0.12 + u * H * 1.3 + Math.cos(ph * 8.1) * H * 0.012;
+            // dokumentförankrat: mätt från pinnens underkant, inte från rutan
+            const sy = pinBottom - H * 1.06 + u * H * 1.5 + Math.cos(ph * 8.1) * H * 0.012;
             txi += (sx - txi) * gather;
             tyi += (sy - tyi) * gather;
           }
@@ -1062,7 +1114,12 @@ void main() {
   // liten introspektionslucka för test — läser bara tillstånd
   (canvas as any).__field = () => {
     let spread = 0;
-    for (let i = 0; i < N; i++) spread += Math.hypot(tx[i] - px[i], ty[i] - py[i]);
+    let vel = 0;
+    for (let i = 0; i < N; i++) {
+      spread += Math.hypot(tx[i] - px[i], ty[i] - py[i]);
+      vel += Math.abs(vy[i]);
+    }
+    vel /= N;
     let targetBox: { x0: number; y0: number; x1: number; y1: number } | null = null;
     if (hasTargets && formation === 'logo') {
       let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
@@ -1075,6 +1132,6 @@ void main() {
       }
       targetBox = { x0, y0, x1, y1 };
     }
-    return { formation, hasTargets, n: N, gl: !!gl, intensity, calm, spread: spread / N, targetBox, wmBox: { ...wmBoxCur } };
+    return { formation, hasTargets, n: N, gl: !!gl, intensity, calm, vel, spread: spread / N, targetBox, wmBox: { ...wmBoxCur } };
   };
 }
