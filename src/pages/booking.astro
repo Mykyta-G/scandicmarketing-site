@@ -16,27 +16,12 @@
    fälten heter redan samma sak som hans nuvarande formulär. */
 import Base from '../layouts/Base.astro';
 import Nav from '../components/Nav.astro';
-import Footer from '../components/Footer.astro';
 
 const base = import.meta.env.BASE_URL.replace(/\/+$/, '');
 
-const steps = [
-  {
-    n: '1',
-    t: 'Vi läser er förfrågan',
-    d: 'Vi går igenom det ni skrivit och förbereder mötet efter era behov — ingen standardpresentation.',
-  },
-  {
-    n: '2',
-    t: 'Besked inom en arbetsdag',
-    d: 'Ni får svar med tid och plats. Passar inte tiden ni valde föreslår vi en annan.',
-  },
-  {
-    n: '3',
-    t: 'Samtalet är kostnadsfritt',
-    d: 'Vi går igenom vad ni vill uppnå och om vi är rätt byrå för det. Ingen förpliktelse.',
-  },
-];
+/* Tre korta löften i stället för tre stycken bredvid formuläret. Samma
+   besked, en rad i stället för en vägg — och högerspalten blir fri. */
+const promises = ['Svar inom en arbetsdag', 'Kostnadsfritt samtal', 'Ingen förpliktelse'];
 
 const times = ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00'];
 ---
@@ -48,105 +33,95 @@ const times = ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00'];
   <canvas class="field-canvas" id="field" aria-hidden="true"></canvas>
   <Nav />
 
-  <main>
-    <section class="head" data-field="braid">
-      <div class="inner">
-        <p class="label section-label reveal">Boka</p>
+  <main class="book">
+    <!-- Fältet ritar bara symbolen, och bara i högerspalten: ingen text
+         ligger där, så den kan vara tät utan att göra något svårläst. -->
+    <div class="inner" data-field="mark">
+      <header class="intro">
         <h1 class="display dash split">Berätta vad ni vill uppnå.</h1>
-        <p class="lead reveal">
-          Fyll i formuläret så återkommer vi inom en arbetsdag. Samtalet är
-          kostnadsfritt och du binder dig inte till något.
-        </p>
-      </div>
-    </section>
+      </header>
 
-    <section class="form-wrap">
-      <div class="inner cols">
-        <form class="form reveal" id="booking-form" novalidate>
-          <div class="row two">
-            <p class="field">
-              <label class="label" for="name">Namn <span class="req">*</span></label>
-              <input id="name" name="name" type="text" required autocomplete="name"
-                placeholder="Ditt fullständiga namn" />
-            </p>
-            <p class="field">
-              <label class="label" for="email">E-post <span class="req">*</span></label>
-              <input id="email" name="email" type="email" required autocomplete="email"
-                placeholder="din@epost.se" />
-            </p>
-          </div>
-
-          <div class="row two">
-            <p class="field">
-              <label class="label" for="phone">Telefon</label>
-              <input id="phone" name="phone" type="tel" autocomplete="tel"
-                placeholder="070-123 45 67" />
-            </p>
-            <p class="field">
-              <label class="label" for="company">Företag</label>
-              <input id="company" name="company" type="text" autocomplete="organization"
-                placeholder="Ert företag" />
-            </p>
-          </div>
-
-          <div class="row two">
-            <p class="field">
-              <label class="label" for="date">Önskat datum</label>
-              <input id="date" name="preferredDate" type="date" />
-            </p>
-            <p class="field">
-              <label class="label" for="time">Önskad tid</label>
-              <select id="time" name="preferredTime">
-                <option value="">Välj en tid</option>
-                {times.map((t) => <option value={t}>{t}</option>)}
-              </select>
-            </p>
-          </div>
-
+      <form class="form reveal" id="booking-form" novalidate>
+        <div class="row two">
           <p class="field">
-            <label class="label" for="message">Berätta om ert projekt <span class="req">*</span></label>
-            <textarea id="message" name="message" rows="6" required
-              placeholder="Vad säljer ni, vem ska hitta er, och vad räknas som resultat för er?"></textarea>
+            <label class="label" for="name">Namn <span class="req">*</span></label>
+            <input id="name" name="name" type="text" required autocomplete="name"
+              placeholder="Ditt fullständiga namn" />
           </p>
+          <p class="field">
+            <label class="label" for="email">E-post <span class="req">*</span></label>
+            <input id="email" name="email" type="email" required autocomplete="email"
+              placeholder="din@epost.se" />
+          </p>
+        </div>
 
+        <div class="row two">
+          <p class="field">
+            <label class="label" for="phone">Telefon</label>
+            <input id="phone" name="phone" type="tel" autocomplete="tel"
+              placeholder="070-123 45 67" />
+          </p>
+          <p class="field">
+            <label class="label" for="company">Företag</label>
+            <input id="company" name="company" type="text" autocomplete="organization"
+              placeholder="Ert företag" />
+          </p>
+        </div>
+
+        <div class="row two">
+          <p class="field">
+            <label class="label" for="date">Önskat datum</label>
+            <input id="date" name="preferredDate" type="date" />
+          </p>
+          <p class="field">
+            <label class="label" for="time">Önskad tid</label>
+            <select id="time" name="preferredTime">
+              <option value="">Välj en tid</option>
+              {times.map((t) => <option value={t}>{t}</option>)}
+            </select>
+          </p>
+        </div>
+
+        <p class="field">
+          <label class="label" for="message">Berätta om ert projekt <span class="req">*</span></label>
+          <textarea id="message" name="message" rows="3" required
+            placeholder="Vad säljer ni, vem ska hitta er, och vad räknas som resultat?"></textarea>
+        </p>
+
+        <div class="send">
+          <button class="cta" type="submit">Skicka förfrågan <span aria-hidden="true">→</span></button>
           <p class="note" id="form-note" role="status" aria-live="polite">
-            Knappen öppnar din e-post med uppgifterna ifyllda — skicka mejlet så
-            har vi det.
+            Knappen öppnar din e-post med uppgifterna ifyllda.
           </p>
+        </div>
 
-          <button class="cta" type="submit">Skicka bokningsförfrågan <span aria-hidden="true">→</span></button>
+        <ul class="promises" aria-label="Vad som gäller">
+          {promises.map((t) => <li class="label">{t}</li>)}
+        </ul>
 
-          <p class="fine">
-            Vi använder uppgifterna bara för att svara på din förfrågan. Läs mer i
-            <a href={`${base}/integritetspolicy`}>integritetspolicyn</a>.
-          </p>
-        </form>
+        <p class="direct-line">
+          <span class="label">Hellre direkt?</span>
+          <a href="mailto:kontakt@scandicmarketing.se">kontakt@scandicmarketing.se</a>
+          <span class="sep" aria-hidden="true">·</span>
+          <a href="tel:+46769298501">+46 76 929 85 01</a>
+        </p>
+      </form>
 
-        <aside class="aside">
-          <div class="card reveal">
-            <p class="label">Hellre direkt?</p>
-            <a class="direct" href="mailto:kontakt@scandicmarketing.se">kontakt@scandicmarketing.se</a>
-            <a class="direct" href="tel:+46769298501">+46 76 929 85 01</a>
-            <p class="hours label">Vardagar 09–17 · svar inom en arbetsdag</p>
-          </div>
-
-          <ol class="steps" data-stagger>
-            {
-              steps.map((s) => (
-                <li class="reveal">
-                  <span class="label n">{s.n}</span>
-                  <h2 class="display">{s.t}</h2>
-                  <p class="text">{s.d}</p>
-                </li>
-              ))
-            }
-          </ol>
-        </aside>
-      </div>
-    </section>
+      <!-- Tom med flit: symbolen bor här. -->
+      <aside class="aside" aria-hidden="true"></aside>
+    </div>
   </main>
 
-  <Footer />
+  <!-- Ingen fullstor sidfot: det här är en uppgiftssida som ska rymmas i en
+       skärm. Det juridiska ligger i en smal remsa i stället. -->
+  <div class="legal">
+    <span>© 2026 Scandic Marketing</span>
+    <span class="links">
+      <a href={`${base}/`}>Startsidan</a>
+      <a href={`${base}/integritetspolicy`}>Integritetspolicy</a>
+      <a href={`${base}/anvandarvillkor`}>Användarvillkor</a>
+    </span>
+  </div>
 </Base>
 
 <script>
@@ -190,31 +165,39 @@ const times = ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00'];
 </script>
 
 <style>
-  .head { padding: clamp(4rem, 11vh, 7rem) 0 clamp(1.5rem, 4vh, 2.5rem); }
+  /* Sidan ska rymmas i en skärm på en vanlig laptop: rubrik och formulär i
+     vänsterspalten, kontakt och stegen i högerspalten bredvid. Klarar den
+     inte höjden (kort fönster, stor text) scrollar den som vanligt — inget
+     är klippt, bara tätare. */
+  .book {
+    /* Naven är fixerad och ligger över innehållet — därför en egen övre
+       marginal här i stället för att lita på flödet. */
+    --nav-h: 4.6rem;
+    min-height: calc(100svh - 3rem); /* 3rem = den smala remsan nedanför */
+    display: flex;
+    align-items: center;
+    padding: calc(var(--nav-h) + clamp(0.5rem, 2vh, 1.5rem)) 0 clamp(1.5rem, 4vh, 3rem);
+  }
   .inner {
     max-width: var(--page-max);
+    width: 100%;
     margin-inline: auto;
     padding-inline: var(--gutter);
-  }
-  .section-label { margin-bottom: 2.2rem; }
-  h1 {
-    font-size: clamp(2.2rem, 5vw, 4rem);
-    max-width: 16ch;
-  }
-  .lead {
-    margin-top: 1.6rem;
-    max-width: var(--measure);
-    color: var(--type-dim);
-    font-size: 1.08rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.8fr);
+    grid-template-rows: auto 1fr;
+    column-gap: clamp(2rem, 4vw, 3.5rem);
+    row-gap: clamp(1.2rem, 3vh, 2rem);
+    align-items: start;
   }
 
-  .form-wrap { padding-bottom: clamp(4rem, 10vh, 7rem); }
-  .cols {
-    display: grid;
-    grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.85fr);
-    gap: clamp(2rem, 5vw, 4rem);
-    align-items: start;
-    margin-top: clamp(2rem, 5vh, 3.5rem);
+  .intro { grid-column: 1; grid-row: 1; }
+  .form { grid-column: 1; grid-row: 2; }
+  .aside { grid-column: 2; grid-row: 1 / span 2; }
+
+  h1 {
+    font-size: clamp(1.9rem, 3.4vw, 3rem);
+    max-width: 15ch;
   }
 
   /* ————— Formuläret ————— */
@@ -223,48 +206,49 @@ const times = ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00'];
     border: 1px solid var(--hairline);
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow-soft);
-    padding: clamp(1.5rem, 3.5vw, 2.6rem);
+    padding: clamp(1.2rem, 2.4vw, 1.8rem);
   }
   .row.two {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1.1rem;
+    gap: 0.9rem;
   }
-  .field { margin: 0 0 1.1rem; display: flex; flex-direction: column; gap: 0.5rem; }
+  .field { margin: 0 0 0.85rem; display: flex; flex-direction: column; gap: 0.35rem; }
   .req { color: var(--accent); }
 
   input, select, textarea {
     font: inherit;
-    font-size: 1rem;
+    font-size: 0.97rem;
     color: var(--navy);
     background: var(--ground);
     border: 1px solid var(--hairline-strong);
     border-radius: var(--radius);
-    padding: 0.8rem 0.9rem;
+    padding: 0.62rem 0.8rem;
     width: 100%;
     transition: border-color 0.2s, box-shadow 0.2s;
   }
-  textarea { resize: vertical; min-height: 8rem; line-height: 1.55; }
+  textarea { resize: vertical; min-height: 5.2rem; line-height: 1.5; }
   input::placeholder, textarea::placeholder { color: var(--muted); opacity: 0.8; }
   input:focus, select:focus, textarea:focus {
     outline: none;
     border-color: var(--accent);
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.16);
   }
-  /* :focus-visible ger fortfarande den globala ringen för tangentbord */
   input:invalid:not(:placeholder-shown) { border-color: #b42318; }
 
-  .note {
-    margin: 0 0 1.3rem;
-    color: var(--type-dim);
-    font-size: 0.9rem;
+  .send {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 0.2rem;
   }
   .cta {
-    display: inline-block;
-    padding: 0.9rem 1.6rem;
+    flex: none;
+    padding: 0.8rem 1.4rem;
     background: var(--accent);
     color: var(--cta-text);
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     font-weight: 600;
     letter-spacing: 0.14em;
     text-transform: uppercase;
@@ -275,58 +259,64 @@ const times = ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00'];
     transition: background 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s;
   }
   .cta:hover { background: var(--accent-strong); box-shadow: var(--shadow-medium); }
-  .fine {
-    margin: 1.3rem 0 0;
-    color: var(--muted);
-    font-size: 0.82rem;
-  }
-  .fine a { color: var(--accent); }
+  .note { margin: 0; color: var(--type-dim); font-size: 0.84rem; max-width: 22rem; }
 
-  /* ————— Sidospalten ————— */
-  .card {
-    background: var(--ground);
-    border: 1px solid var(--hairline);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-soft);
-    padding: 1.5rem;
+  .direct-line {
+    margin: 0.9rem 0 0;
     display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem 0.7rem;
+    font-size: 0.94rem;
+    color: var(--type-dim);
   }
-  .direct {
-    color: var(--navy);
-    font-size: 1.02rem;
-    text-decoration: none;
-    transition: color 0.2s;
-  }
-  .direct:hover { color: var(--accent); }
-  .hours { margin: 0.4rem 0 0; color: var(--muted); }
+  .direct-line a { color: var(--navy); text-decoration: none; transition: color 0.2s; }
+  .direct-line a:hover { color: var(--accent); }
+  .sep { color: var(--hairline-strong); }
 
-  .steps {
+  .promises {
     list-style: none;
-    margin: 2.2rem 0 0;
-    padding: 0;
-    display: grid;
-    gap: 1.8rem;
+    margin: 1.1rem 0 0;
+    padding: 0.9rem 0 0;
+    border-top: 1px solid var(--hairline);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.4rem;
+    color: var(--muted);
   }
-  .steps li { border-left: 1px solid var(--hairline); padding-left: 1.3rem; }
-  .n { color: var(--accent); }
-  .steps h2 {
-    margin: 0.5rem 0 0.5rem;
-    font-size: 1.12rem;
-    font-weight: 700;
-    letter-spacing: -0.01em;
+  .promises li { display: flex; align-items: center; gap: 0.5rem; }
+  .promises li::before {
+    content: '';
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
   }
-  .text { color: var(--type-dim); font-size: 0.94rem; }
+
+  .legal {
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    max-width: var(--page-max);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+    color: var(--muted);
+    font-size: 0.76rem;
+  }
+  .legal .links { display: flex; gap: 1.2rem; }
+  .legal a { color: var(--muted); text-decoration: none; }
+  .legal a:hover { color: var(--accent); }
 
   @media (max-width: 900px) {
-    /* Formuläret först på smalt: det ÄR sidan. Kontaktkortet och stegen
-       hamnade tidigare ovanför och sköt ner det under tre skärmar. */
-    .cols { grid-template-columns: 1fr; }
-    .aside { display: contents; }
-    .form { order: 1; }
-    .card { order: 2; margin-top: 1.6rem; }
-    .steps { order: 3; margin-top: 1.8rem; }
+    /* En spalt, och formuläret först — det ÄR sidan. */
+    .book { min-height: 0; display: block; }
+    .inner { grid-template-columns: 1fr; }
+    .intro, .form, .aside { grid-column: 1; grid-row: auto; }
+    /* Symbolen ritas i en fast canvas bakom innehållet — spalten behöver
+       ingen egen yta på smalt. */
+    .aside { display: none; }
   }
   @media (max-width: 560px) {
     .row.two { grid-template-columns: 1fr; gap: 0; }

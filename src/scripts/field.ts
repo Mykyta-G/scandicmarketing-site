@@ -857,19 +857,21 @@ void main() {
         if (formation !== 'shapes') { shapesPhase = -1; formation = 'shapes'; }
       } else if (owner && owner !== formation) {
         setFormation(owner);
-      } else if (owner === 'logo' && !hasTargets) {
-        // logotypfilen fanns inte när vi först försökte (avbrott, kall
-        // dev-server, tappat nät). Försök igen — annars driver hjälten
-        // fritt resten av besöket och titeln kommer aldrig tillbaka.
+      } else if ((owner === 'logo' || owner === 'mark') && !hasTargets) {
+        /* Ordmärket och symbolen hämtar båda sin form ur logotypfilen. Fanns
+           den inte när vi först försökte (avbrott, kall dev-server, tappat
+           nät) driver fältet fritt resten av besöket. Försök tills den finns. */
         retryT += 0.13;
         if (retryT > 0.6) {
           retryT = 0;
-          if (logoImg) { setFormation('logo'); if (hasTargets) takeOver(); }
-          else reloadLogo().then(() => {
-            if (!logoImg || formation !== 'logo') return;
-            setFormation('logo');
-            if (hasTargets) takeOver(); // bildfallbacken viker undan först nu
-          });
+          const retake = () => {
+            if (!logoImg) return;
+            setFormation(formation, lastProgress);
+            // bildfallbacken i hjälten viker undan först när målen finns
+            if (formation === 'logo' && hasTargets) takeOver();
+          };
+          if (logoImg) retake();
+          else reloadLogo().then(retake);
         }
       }
     }
@@ -1103,8 +1105,10 @@ void main() {
     : first?.dataset.field || 'drift';
   setFormation(start); // fritt driv tills filen är dekodad
   logoGate.then(() => {
-    if (formation === 'logo') setFormation('logo', lastProgress);
-    else if (!document.querySelector('[data-field="logo"]')) wmEl?.classList.add('wm-taken');
+    // Både ordmärket och symbolen samplas ur filen — räkna om den som äger
+    // fältet när den landat.
+    if (formation === 'logo' || formation === 'mark') setFormation(formation, lastProgress);
+    if (!document.querySelector('[data-field="logo"]')) wmEl?.classList.add('wm-taken');
     // först nu viker bildfallbacken undan — annars står hjälten tom en stund
     if (hasTargets) takeOver();
   });
