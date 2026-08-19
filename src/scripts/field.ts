@@ -13,12 +13,19 @@
                ur img/logo.webp, samma fil som naven visar. Formen är alltså
                inte en efterlikning i Inter utan märket självt
     mark     — enbart symbolen ur logotypen, tät och skarp (Kontakt)
-    drift    — fritt flöde, låg intensitet bakom läsytor
+    strand   — en vandrande tråd; stoftet efter hjältens explosion samlar
+               sig i den i stället för att bli ett formlöst moln (Samarbeten)
     bars     — stigande staplar (Resultat: mätbarhet)
     shapes   — play-triangel → hårkors genom Tjänster
-    wave     — kustlinje/horisont (Break — Öresund)
+    wave     — tre dyningar som vandrar (Break)
     steps    — stigande bana under stegtexten (Så arbetar vi)
+    braid    — två trådar som väver om varandra (Vanliga frågor)
+    drift    — fritt flöde, ingen formation
     converge — konvergenspunkt (fri, används i partikellabbet)
+
+  Formationerna sitter inte fast i rutan. Var och en har ett ankare i
+  layouten och räknas om ur dess färska rektangel varje bildruta, så figuren
+  åker med innehållet i stället för att stå kvar medan sidan glider förbi.
 
   prefers-reduced-motion: en enda stilla, färdig bild — inga lyssnare, ingen loop.
 */
@@ -144,11 +151,36 @@ export function initField(canvas: HTMLCanvasElement | null, extra: Formation[] =
   }
 
   function fitRect(aspect: number, maxWFrac: number, maxHFrac: number, cx: number, cy: number) {
+    return fitBox(aspect, maxWFrac, maxHFrac, cx, cy * H);
+  }
+  function fitBox(aspect: number, maxWFrac: number, maxHFrac: number, cx: number, cyPx: number) {
     let w = W * maxWFrac;
     let h = w / aspect;
     if (h > H * maxHFrac) { h = H * maxHFrac; w = h * aspect; }
-    return { x: cx * W - w / 2, y: cy * H - h / 2, w, h };
+    return { x: cx * W - w / 2, y: cyPx - h / 2, w, h };
   }
+
+  /* Varje formations ankare i layouten. Rektangeln läses färskt vid varje
+     omräkning — det är skillnaden mellan en figur som följer med sidan och
+     en som står kvar i rutan medan innehållet åker förbi. */
+  const ANCHORS: Record<string, string> = {
+    strand: '.clients .rail',
+    bars: '.results .band',
+    wave: '.break .content',
+    braid: '.faq .list',
+    mark: '.contact .rows',
+  };
+  const anchorEls = new Map<string, HTMLElement | null>();
+  function anchorRect(name: string) {
+    const sel = ANCHORS[name];
+    if (!sel) return null;
+    if (!anchorEls.has(name)) anchorEls.set(name, document.querySelector(sel));
+    const el = anchorEls.get(name);
+    if (!el) return null;
+    const r = el.getBoundingClientRect();
+    return r.height > 2 ? r : null;
+  }
+  let animT = 0; // sekunder — driver de formationer som ska leva
 
   // ————— Ordmärket — skarp text, inte bitmap —————
   // Glyferna samplas EN gång per storlek till råpunkter i offscreen-rymd;
@@ -230,12 +262,14 @@ export function initField(canvas: HTMLCanvasElement | null, extra: Formation[] =
     if (guest) return guest.points(W, H, rr);
 
     if (name === 'bars') {
-      // fem stigande staplar av punkter — mätbarhet
+      // fem stigande staplar av punkter — mätbarhet. Står på resultatbandets
+      // överkant och åker med det: figuren hör ihop med siffrorna, inte med rutan.
       const out: number[] = [];
       const heights = [0.3, 0.45, 0.4, 0.62, 0.85];
-      const bandW = Math.min(W * 0.6, 760);
-      const x0 = (W - bandW) / 2;
-      const baseY = H * 0.72;
+      const a = anchorRect('bars');
+      const bandW = Math.min(a ? a.width * 0.86 : W * 0.6, 760);
+      const x0 = a ? a.left + (a.width - bandW) / 2 : (W - bandW) / 2;
+      const baseY = a ? a.top - Math.max(24, H * 0.03) : H * 0.72;
       const colW = bandW / heights.length;
       for (let c = 0; c < heights.length; c++) {
         const hgt = heights[c] * H * 0.42;
@@ -287,19 +321,75 @@ export function initField(canvas: HTMLCanvasElement | null, extra: Formation[] =
     }
 
     if (name === 'wave') {
-      // kustlinje: tre långsamma dyningar över hela bredden
+      /* Tre dyningar tvärs hela bredden, centrerade på brytsektionens text.
+         Vågorna VANDRAR: fasen drivs av klockan och målen räknas om varje
+         bildruta, så vattnet rör sig i stället för att stå som en frusen bild.
+         Varje partikel har sin egen plats längs kurvan (u ur permutationen),
+         alltså glider den längs vågen — den hoppar inte mellan punkter. */
+      const a = anchorRect('wave');
+      const mid = a ? a.top + a.height / 2 : H * 0.52;
+      const amp = Math.min(H * 0.05, 64);
       const out: number[] = [];
-      const rows = [0.46, 0.52, 0.58];
+      const rows = [-1.15, 0, 1.15];
       for (let ri = 0; ri < rows.length; ri++) {
-        const yBase = rows[ri] * H;
-        const pts = 700;
+        const yBase = mid + rows[ri] * amp * 1.35;
+        const ph = animT * (0.26 + ri * 0.05) + ri * 1.9;
+        const pts = 780;
         for (let i = 0; i < pts; i++) {
           const x = (i / pts) * W;
           const y =
             yBase +
-            Math.sin((x / W) * TAU * 1.6 + ri * 1.9) * H * 0.035 +
-            Math.sin((x / W) * TAU * 3.7 + ri * 4.1) * H * 0.012 +
-            (rr() - 0.5) * H * 0.02;
+            Math.sin((x / W) * TAU * 1.6 - ph) * amp * 0.72 +
+            Math.sin((x / W) * TAU * 3.7 - ph * 1.7 + ri * 4.1) * amp * 0.26 +
+            (rr() - 0.5) * amp * 0.34;
+          out.push(x, y);
+        }
+      }
+      return out;
+    }
+
+    if (name === 'strand') {
+      /* Efter hjältens explosion: stoftet samlar sig i en enda vandrande
+         tråd i stället för att bli ett formlöst moln. Tunn, låg, lugn —
+         den ska läsas som en linje, inte som en våg. */
+      /* Ligger i tomrummet OVANFÖR logotypremsan, aldrig över märkena:
+         två trådar som korsar en logotyp gör båda svårlästa. */
+      const a = anchorRect('strand');
+      const amp = Math.min(H * 0.09, 96);
+      const mid = a ? a.top - Math.max(amp * 1.5, H * 0.13) : H * 0.36;
+      const out: number[] = [];
+      const pts = 1500;
+      for (let i = 0; i < pts; i++) {
+        const u = i / pts;
+        const x = -W * 0.04 + u * W * 1.08;
+        const y =
+          mid +
+          Math.sin(u * TAU * 1.15 - animT * 0.22) * amp +
+          Math.sin(u * TAU * 2.6 + animT * 0.15) * amp * 0.3 +
+          (rr() - 0.5) * amp * 0.16;
+        out.push(x, y);
+      }
+      return out;
+    }
+
+    if (name === 'braid') {
+      /* Två trådar som väver om varandra och byter plats där de möts —
+         fråga och svar. Ligger bakom frågelistan, nedtonad. */
+      const a = anchorRect('braid');
+      const mid = a ? a.top + a.height / 2 : H * 0.5;
+      const amp = Math.min(H * 0.14, 150);
+      const out: number[] = [];
+      const pts = 900;
+      for (let k = 0; k < 2; k++) {
+        const sign = k ? -1 : 1;
+        for (let i = 0; i < pts; i++) {
+          const u = i / pts;
+          const x = -W * 0.04 + u * W * 1.08;
+          const y =
+            mid +
+            sign * Math.sin(u * TAU * 1.4 - animT * 0.2) * amp +
+            sign * Math.sin(u * TAU * 3.1 + animT * 0.11) * amp * 0.18 +
+            (rr() - 0.5) * amp * 0.1;
           out.push(x, y);
         }
       }
@@ -363,14 +453,16 @@ export function initField(canvas: HTMLCanvasElement | null, extra: Formation[] =
         if (!pts) return null;
         markRaw = pts; markW = off.width; markH = off.height;
       }
-      // brett: till höger om kontaktuppgifterna. Smalt: nere till höger,
-      // där sidan är tom — annars ligger den rakt under raderna.
       // brett: en tät symbol bredvid uppgifterna. Smalt: ingen fri yta finns
       // — då blir den i stället en stor, blek vattenstämpel bakom allt.
+      // Ankrad i kontaktraderna: symbolen åker med uppgifterna i stället för
+      // att stå kvar i rutan och skäras av sidfoten på vägen ut.
+      const a = anchorRect('mark');
       const narrow = W < 900;
+      const cy = a ? a.top + a.height / 2 : H * 0.5;
       const box = narrow
-        ? fitRect(markW / markH, 0.72, 0.46, 0.5, 0.52)
-        : fitRect(markW / markH, 0.22, 0.62, 0.78, 0.5);
+        ? fitBox(markW / markH, 0.72, 0.46, 0.5, cy)
+        : fitBox(markW / markH, 0.22, 0.62, a ? (a.right + W) / 2 / W : 0.78, cy);
       const out: number[] = [];
       for (let i = 0; i < markRaw.length; i += 2) {
         out.push(
@@ -400,7 +492,8 @@ export function initField(canvas: HTMLCanvasElement | null, extra: Formation[] =
   }
 
   const GOALS: Record<string, number> = {
-    logo: 1.12, mark: 1.05, drift: 0.42, bars: 0.62, shapes: 0.62, wave: 0.72, steps: 0.68, converge: 0.72,
+    logo: 1.12, mark: 1.05, drift: 0.42, bars: 0.62, shapes: 0.62, wave: 0.72,
+    steps: 0.68, strand: 0.66, braid: 0.5, converge: 0.72,
   };
   for (const f of extra) GOALS[f.name] = f.goal;
 
@@ -443,12 +536,21 @@ export function initField(canvas: HTMLCanvasElement | null, extra: Formation[] =
       layoutWord(wmViewBox()); // och sedan varje bildruta i loopen
       return;
     }
-    const t = targetsFor(name, progress);
+    if (formation !== name) anchorPrevY = NaN;
     formation = name;
     intensityGoal = GOALS[name] ?? 0.5;
     // ligger formen bakom text tonas den ner till vattenstämpel
     if (name === 'steps' && stepsTight) intensityGoal = 0.34;
     if (name === 'mark' && W < 900) intensityGoal = 0.4;
+    applyTargets(name, progress);
+  }
+
+  /* Räknar om målen för en formation och lägger dem i tx/ty. Deterministisk:
+     samma partikel hamnar på samma plats i figuren varje gång, så den kan
+     köras om varje bildruta utan att punkterna byter plats inbördes — det är
+     det som gör att vågen VANDRAR i stället för att blinka om. */
+  function applyTargets(name: string, progress = 0) {
+    const t = targetsFor(name, progress);
     if (!t) { hasTargets = false; return; }
     hasTargets = true;
     const m = t.length / 2;
@@ -460,6 +562,38 @@ export function initField(canvas: HTMLCanvasElement | null, extra: Formation[] =
       tx[i] = t[j * 2] + (seeds[i * 3] - 1.95) * jx;
       ty[i] = t[j * 2 + 1] + (seeds[i * 3 + 2] - Math.PI) * jy;
     }
+  }
+
+  /* Formationer som räknas om varje bildruta: de är billiga (ren aritmetik)
+     och antingen levande eller ankrade i layouten. 'shapes' står utanför —
+     den läser tillbaka en canvas och kostar för mycket per bildruta.
+     'logo' har sin egen väg via layoutWord. */
+  const LIVE = new Set(['wave', 'strand', 'braid', 'bars', 'mark']);
+
+  /* Rigid följning.
+
+     En ankrad formation får nya mål när sidan scrollar, och fjädern drar
+     partiklarna efter. Vid långsam scroll märks det inte; vid snabb scroll
+     ligger figuren efter och guppar ikapp — den ser ut att jaga vyn.
+
+     Botemedlet är att flytta partiklarna lika mycket som ankaret flyttade
+     sig, i samma bildruta som målen. Då är avståndet till målet oförändrat
+     och fjädern har inget att ta igen: figuren sitter fast i sidan och
+     scrollar som vilket innehåll som helst. Fjädern får sköta formen, inte
+     transporten. */
+  let anchorPrevY = NaN;
+  function rideAnchor(name: string) {
+    const r = anchorRect(name);
+    if (!r) { anchorPrevY = NaN; return; }
+    const y = r.top + r.height / 2;
+    if (Number.isFinite(anchorPrevY)) {
+      const dy = y - anchorPrevY;
+      // stora hopp (ankarbyte, hash-navigering) ska inte kasta iväg molnet
+      if (dy !== 0 && Math.abs(dy) < H * 1.5) {
+        for (let i = 0; i < N; i++) py[i] += dy;
+      }
+    }
+    anchorPrevY = y;
   }
 
   // ————— Rendering: WebGL med Canvas2D-fallback —————
@@ -720,6 +854,15 @@ void main() {
       }
     }
 
+    animT = t;
+
+    // Levande och ankrade formationer räknas om varje bildruta: vågorna
+    // vandrar, och figurerna åker med sitt innehåll när sidan scrollar.
+    if (hasTargets && LIVE.has(formation)) {
+      rideAnchor(formation); // flytta molnet FÖRE målen — annars uppstår glappet
+      applyTargets(formation, lastProgress);
+    }
+
     // Så arbetar vi: banan följer steglistan i stället för att stå still i
     // vyn medan texten glider upp i den
     if (formation === 'steps' && stepsEl) {
@@ -747,7 +890,7 @@ void main() {
     // samlar ihop sig igen på vägen upp — övergången ÄR effekten.
     let disp = 0;
     if (wordMode) {
-      const p = Math.min(Math.max(scrollY / (H * 0.7), 0), 1);
+      const p = Math.min(Math.max(scrollY / (H * 0.5), 0), 1);
       disp = p * p * (3 - 2 * p);
     }
 
@@ -792,13 +935,48 @@ void main() {
         const a = Math.sin(x * 0.0008 + t * 0.1) * 2.0 + Math.cos(y * 0.0007 - t * 0.09) * 2.0;
         vx[i] += Math.cos(a) * driftAmp;
         vy[i] += Math.sin(a) * driftAmp;
-        // fjäder mot målet — som skingras uppåt/utåt när hjälten scrollas förbi
+        /* Hjältens upplösning i två akter.
+
+           Först exploderar ordet — partiklarna kastas utåt. Men ett moln som
+           bara fortsätter tunnas ut lämnar en tom, grå yta mellan hjälten och
+           logotyperna. Så i andra akten samlar sig stoftet i TVÅ nedåtgående
+           trådar som väver om varandra och rinner ner mot samarbetsremsan,
+           där de möts i den vågräta tråden. Explosionen får en riktning. */
         let txi = tx[i], tyi = ty[i];
         if (disp > 0.002) {
           const ph = seeds[i * 3 + 2];
-          const rad = disp * H * (0.22 + 0.5 * ((seeds[i * 3] - 1.2) / 1.5));
+          const sz = (seeds[i * 3] - 1.2) / 1.5; // 0..1 ur storleksfröet
+
+          // akt 1: utåt
+          const blast = Math.min(disp / 0.26, 1);
+          const rad = blast * H * (0.22 + 0.5 * sz);
           txi += Math.cos(ph * 3.7) * rad;
           tyi += (Math.sin(ph * 2.9) - 0.7) * rad;
+
+          // akt 2: ner i två trådar
+          const g = disp <= 0.18 ? 0 : Math.min((disp - 0.18) / 0.62, 1);
+          if (g > 0) {
+            const gather = g * g * (3 - 2 * g);
+            const side = i & 1 ? 1 : -1;
+            const u = (ph / TAU + sz * 0.37) % 1; // egen plats längs tråden
+
+            /* Trådarna går isär på vägen ner och lämnar rutan i var sitt
+               nedre hörn — de rinner ut ur bilden i stället för att sluta
+               mitt i den. Kvadratisk öppning: smalt uppe, brett nere. */
+            const splay = 0.13 + 0.62 * u * u;
+            // en tråd är inte en linje: den har kropp. Tvärsnittet växer
+            // nedåt, tätast i mitten (kubisk fördelning ur fröet).
+            const q = Math.sin(ph * 12.9 + sz * 7.3);
+            const thick = (W * 0.016 + u * W * 0.03) * q * q * q;
+
+            const sx =
+              W * 0.5 +
+              side * (W * splay + thick) +
+              Math.sin(u * TAU * 1.35 + animT * 0.3 + (side > 0 ? 0 : 2.1)) * W * 0.05;
+            const sy = -H * 0.12 + u * H * 1.3 + Math.cos(ph * 8.1) * H * 0.012;
+            txi += (sx - txi) * gather;
+            tyi += (sy - tyi) * gather;
+          }
         }
         vx[i] += (txi - x) * spring;
         vy[i] += (tyi - y) * spring;
@@ -867,6 +1045,7 @@ void main() {
         px[i] = (px[i] / ow) * W;
         py[i] = (py[i] / oh) * H;
       }
+      anchorEls.clear();
       if (formation) setFormation(formation, lastProgress);
     }, 150) as unknown as number;
   }, { passive: true });
