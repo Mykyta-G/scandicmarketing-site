@@ -16,6 +16,15 @@ npm run build    # produktionsbygge till dist/
 
 ## Deploy
 
-Push till `main` bygger och deployar automatiskt till GitHub Pages via
-`.github/workflows/deploy.yml`. För produktion på egen domän: bygg utan
-`SITE`/`BASE_PATH` (default är https://www.scandicmarketing.se med basen `/`).
+Push till `main` bygger och deployar automatiskt via Vercel. Domänen pekar på
+projektet, inte på en enskild version — DNS rörs alltså bara en gång.
+
+Bygget behöver `PUBLIC_SUPABASE_URL` och `PUBLIC_SUPABASE_ANON_KEY` för att
+bokningsformuläret ska skicka i bakgrunden; utan dem faller det tillbaka på
+besökarens e-postprogram. Lokalt ligger de i `.env` (gitignorerad), i
+produktion som miljövariabler i Vercel.
+
+`SITE`/`BASE_PATH` lämnas tomma på egen domän — default är
+https://www.scandicmarketing.se med basen `/`.
+
+Se [HANDOFF.md](HANDOFF.md) för ägarskap, roller och vad som återstår.
