@@ -99,10 +99,25 @@ const times = ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00'];
             placeholder="Vad säljer ni, vem ska hitta er, och vad räknas som resultat?"></textarea>
         </p>
 
+        <!-- Skräpfälla: fältet är dolt och tomt för människor. Fyller en bot i
+             det låtsas vi att allt gick bra utan att skicka något — en bot som
+             får ett felmeddelande försöker igen, en som får kvittens går
+             vidare. Bokningarna landar bara i en inkorg, så skräp är inte
+             bara irriterande: det kan dränka en riktig förfrågan. -->
+        <p class="trap" aria-hidden="true">
+          <label for="company_url">Lämna detta fält tomt</label>
+          <input id="company_url" name="company_url" type="text" tabindex="-1" autocomplete="off" />
+        </p>
+
         <div class="send">
           <button class="cta" type="submit">Skicka förfrågan <span aria-hidden="true">→</span></button>
           <p class="note" id="form-note" role="status" aria-live="polite"></p>
         </div>
+
+        <p class="consent">
+          Uppgifterna används bara för att svara på din förfrågan. Läs mer i
+          <a href={`${base}/integritetspolicy`}>integritetspolicyn</a>.
+        </p>
 
         <ul class="promises" aria-label="Vad som gäller">
           {promises.map((t) => <li class="label">{t}</li>)}
@@ -194,6 +209,11 @@ const times = ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00'];
     e.preventDefault();
     if (!form.reportValidity()) return;
     const v = values(form);
+
+    /* Skräpfällan slog till. Samma kvittens som en riktig bokning får — en bot
+       som märker att den blockeras byter bara taktik. Inget skickas. */
+    if (v.company_url) { succeed(); return; }
+    delete v.company_url;
 
     if (!canPost) { mailto(v); return; }
 
@@ -329,6 +349,26 @@ const times = ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00'];
     transition: background 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s;
   }
   .cta:hover { background: var(--accent-strong); box-shadow: var(--shadow-medium); }
+  /* Skräpfällan: borta för ögat och för skärmläsaren, men ifyllbar för en bot
+     som läser markupen. Därför inte display:none — en del bottar hoppar över
+     fält som är helt borttagna ur layouten. */
+  .trap {
+    position: absolute;
+    width: 1px; height: 1px;
+    margin: -1px; padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .consent {
+    margin: 0.9rem 0 0;
+    color: var(--muted);
+    font-size: 0.8rem;
+    max-width: 44ch;
+  }
+  .consent a { color: var(--accent); }
+
   .note { margin: 0; color: var(--type-dim); font-size: 0.84rem; max-width: 24rem; }
   .note:empty { display: none; }
   .note.is-error { color: #b42318; }
