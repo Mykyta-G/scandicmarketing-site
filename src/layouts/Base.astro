@@ -21,7 +21,10 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
-    <link rel="icon" href={`${base}/favicon.svg`} type="image/svg+xml" />
+    <!-- Ägarens egen symbol, klippt ur logotypen i stället för hans 32-pixels
+         favicon — samma märke, men i rätt proportion och skarpt på hi-dpi. -->
+    <link rel="icon" href={`${base}/favicon.ico`} sizes="16x16 32x32 48x48" />
+    <link rel="apple-touch-icon" href={`${base}/apple-touch-icon.png`} />
 
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
